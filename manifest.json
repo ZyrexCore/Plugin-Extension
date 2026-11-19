@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Mudra Mod",
+  "version": "0.0.1",
+  "description": "Mudra Mod by ZyrexCore: configurable WhatsApp commands, custom assets and optional Kannada to Nudi 5.0 conversion.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://discord.com/api/webhooks/*"],
+  "icons": {"16":"icon.png","32":"icon.png","48":"icon.png","128":"icon.png"},
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {"16":"icon.png","32":"icon.png","48":"icon.png","128":"icon.png"},
+    "default_title": "Bleeeeh :p"
+  },
+  "content_scripts": [{
+    "matches": ["https://web.whatsapp.com/*"],
+    "js": ["config.js","content.js"],
+    "run_at": "document_idle"
+  }],
+  "web_accessible_resources": [{
+    "resources": ["review-qr.png","payment-qr.png","icon.png"],
+    "matches": ["https://web.whatsapp.com/*"]
+  }]
+}
