@@ -2,30 +2,42 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f5f6f2">
-<title>Nudi Web — Kannada Legacy Text Converter</title>
-<meta name="description" content="Type Kannada and convert between Unicode and legacy Nudi ASCII.">
+<meta name="theme-color" content="#101116">
+<title>AKSHARA — Nudi Conversion Lab</title>
+<meta name="description" content="A focused Kannada workspace for typing and converting Unicode and legacy Nudi text.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anek+Kannada:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anek+Kannada:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="js/nudi-engine.js"></script>
 </head>
 <body>
-<header class="topbar"><a class="brand" href="./"><span class="brand-mark">ನು</span><span>nudi<span class="brand-light">web</span><small>KANNADA TEXT WORKSPACE</small></span></a><div class="top-actions"><span id="keyboardStatus" class="status">LOADING KEYBOARD…</span><button id="themeBtn" class="icon-btn" aria-label="Toggle theme">◐</button></div></header>
+<div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+<header class="topbar">
+<a class="brand" href="./"><span class="brand-symbol">ಅ</span><span class="brand-copy">AKSHARA<span class="brand-sub">KANNADA CONVERSION LAB</span></span></a>
+<div class="top-actions"><span id="keyboardStatus" class="status">LOADING KEYBOARD…</span><button id="themeBtn" class="theme-btn" aria-label="Toggle light theme"><span>◐</span> <small>THEME</small></button></div>
+</header>
 <main>
-<section class="hero"><div class="eyebrow"><span></span> KANNADA · LEGACY FONT WORKFLOW</div><h1>Your Kannada.<br><em>In the right format.</em></h1><p>Type, convert and move Kannada text between modern Unicode and classic Nudi ASCII. Keep your original text safe while you work.</p></section>
-<section class="workspace">
-<div class="workspace-top"><div><span class="kicker">THE CONVERTER</span><h2 id="directionTitle">Unicode Kannada → Nudi ASCII</h2><p id="directionHelp">Paste or type Unicode Kannada. Convert it into legacy Nudi text for compatible Nudi fonts.</p></div><div class="mode-switch"><button data-mode="u2a" class="active">Unicode → Nudi</button><button data-mode="a2u">Nudi → Unicode</button></div></div>
-<div class="toolbar"><button id="sampleBtn" class="tool-btn">Try sample</button><button id="uploadBtn" class="tool-btn">Upload .txt</button><input id="fileInput" type="file" accept=".txt,text/plain" hidden><span class="toolbar-spacer"></span><button id="swapBtn" class="tool-btn">⇄ Switch direction</button><button id="clearBtn" class="tool-btn danger">Clear</button></div>
-<div class="editor-grid">
-<section id="unicodePanel" class="editor-card"><div class="card-head"><div><span class="kicker">INPUT · UNICODE</span><h3>ಕನ್ನಡ ಪಠ್ಯ</h3></div><span class="tag unicode-tag">UNICODE</span></div><textarea id="unicodeInput" spellcheck="false" placeholder="ಇಲ್ಲಿ ಕನ್ನಡ ಪಠ್ಯವನ್ನು ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಅಂಟಿಸಿ…"></textarea><div class="card-foot"><span id="unicodeCount">0 characters</span><span>F9 switches Nudi / English typing</span></div></section>
-<section id="asciiPanel" class="editor-card hidden"><div class="card-head"><div><span class="kicker">INPUT · LEGACY</span><h3>Nudi ASCII text</h3></div><span class="tag">LEGACY TEXT</span></div><textarea id="asciiInput" spellcheck="false" placeholder="Paste legacy Nudi ASCII text here…"></textarea><div class="card-foot"><span id="asciiCount">0 characters</span><span>Paste text copied from an older Nudi document</span></div></section>
-<div class="convert-action"><span class="flow-line"></span><button id="convertBtn" class="convert-btn">Convert to Nudi ASCII <span>→</span></button><span class="flow-line"></span></div>
-<section id="resultPanel" class="result-card hidden"><div class="card-head"><div><span class="kicker">CONVERSION RESULT</span><h3 id="resultLabel">NUDI LEGACY TEXT</h3></div><span id="resultCount" class="result-count">0 characters</span></div><textarea id="asciiOutput" readonly spellcheck="false" placeholder="Your converted text will appear here…"></textarea><textarea id="unicodeOutput" readonly spellcheck="false" placeholder="Unicode Kannada result…" class="hidden"></textarea><div class="result-actions"><span class="result-note">Check the result before copying it into your document.</span><div><button id="copyResult" class="tool-btn">Copy Nudi ASCII</button><button id="downloadResult" class="download-btn">Download .txt</button></div></div></section>
-</div>
-<div class="compat-note"><span class="info-icon">i</span><p><strong>Legacy font note</strong> Nudi ASCII is not Unicode. Apply a compatible legacy Nudi font in Word or your target application to display it as Kannada. Use Unicode output for WhatsApp, websites and modern apps.</p></div>
+<section class="hero">
+<div class="hero-meta"><span class="eyebrow">TOOLS FOR KANNADA TYPE</span><span class="hero-index">WORKSPACE / 001</span></div>
+<h1>Words have a<br><span>second life.</span></h1>
+<p class="hero-copy">Move between modern Unicode and classic Nudi legacy text. Type, convert, copy — without losing the script you work in.</p>
+<div class="hero-stats"><div><b>01</b><span>TYPE</span></div><i></i><div><b>02</b><span>CONVERT</span></div><i></i><div><b>03</b><span>EXPORT</span></div></div>
 </section>
-<section class="below"><div><span class="kicker">MADE FOR REAL KANNADA WORK</span><h2>From typing to<br>print-ready text.</h2></div><div class="feature-list"><article><b>01</b><div><h3>Nudi-style keyboard</h3><p>Type directly in the Unicode editor using the keyboard layout. Press F9 to switch to English.</p></div></article><article><b>02</b><div><h3>Two-way conversion</h3><p>Convert Unicode Kannada to legacy Nudi ASCII, or bring older Nudi text back to Unicode.</p></div></article><article><b>03</b><div><h3>Copy and export</h3><p>Copy the converted result or download a plain-text file for your document workflow.</p></div></article></div></section>
-</main><footer><span>NUDI WEB · KANNADA TEXT WORKSPACE</span><span>Conversion engine attribution: Sanchaya · GPL-3.0</span></footer><div id="toast" role="status"></div>
+<section class="workspace">
+<div class="workspace-bar"><div class="workspace-title"><span class="live-mark"></span><div><span class="kicker">ACTIVE SESSION</span><h2 id="directionTitle">Unicode Kannada → Nudi ASCII</h2></div></div><div class="mode-switch"><button data-mode="u2a" class="active">UNICODE <span>→</span> NUDI</button><button data-mode="a2u">NUDI <span>→</span> UNICODE</button></div></div>
+<p id="directionHelp" class="direction-help">Paste or type Unicode Kannada. Convert it into legacy Nudi text for compatible Nudi fonts.</p>
+<div class="toolbar"><div class="toolbar-group"><button id="sampleBtn" class="tool-btn">＋ Sample text</button><button id="uploadBtn" class="tool-btn">↥ Import .txt</button><input id="fileInput" type="file" accept=".txt,text/plain" hidden></div><span class="toolbar-spacer"></span><div class="toolbar-group"><button id="swapBtn" class="tool-btn">⇄ Reverse</button><button id="clearBtn" class="tool-btn clear-btn">Clear all</button></div></div>
+<div class="editor-grid">
+<section id="unicodePanel" class="editor-card"><div class="card-head"><div><span class="panel-number">A / INPUT</span><h3>ಕನ್ನಡ ಪಠ್ಯ <small>Unicode source</small></h3></div><span class="format-tag">UNICODE</span></div><textarea id="unicodeInput" spellcheck="false" placeholder="ಇಲ್ಲಿ ಕನ್ನಡ ಪಠ್ಯವನ್ನು ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಅಂಟಿಸಿ…"></textarea><div class="card-foot"><span id="unicodeCount">0 characters</span><span class="keyboard-hint">⌨ F9 <b>Switch Kannada / English</b></span></div></section>
+<section id="asciiPanel" class="editor-card hidden"><div class="card-head"><div><span class="panel-number">A / INPUT</span><h3>Nudi legacy text <small>Encoded source</small></h3></div><span class="format-tag legacy">LEGACY</span></div><textarea id="asciiInput" spellcheck="false" placeholder="Paste legacy Nudi ASCII text here…"></textarea><div class="card-foot"><span id="asciiCount">0 characters</span><span class="keyboard-hint">PASTE <b>Existing Nudi text</b></span></div></section>
+<div class="convert-action"><div class="convert-rule"></div><button id="convertBtn" class="convert-btn">Convert to Nudi ASCII <span>↗</span></button><div class="convert-rule"></div></div>
+<section id="resultPanel" class="result-card hidden"><div class="card-head"><div><span class="panel-number">B / OUTPUT</span><h3 id="resultLabel">NUDI LEGACY TEXT</h3></div><span id="resultCount" class="result-count">0 characters</span></div><textarea id="asciiOutput" readonly spellcheck="false" placeholder="Your converted text will appear here…"></textarea><textarea id="unicodeOutput" readonly spellcheck="false" placeholder="Unicode Kannada result…" class="hidden"></textarea><div class="result-actions"><span class="result-note">Review your result before using it in another application.</span><div><button id="copyResult" class="tool-btn copy-btn">Copy Nudi ASCII</button><button id="downloadResult" class="download-btn">Download .TXT ↓</button></div></div></section>
+</div>
+<div class="compat-note"><span class="note-mark">i</span><p><strong>Legacy font reminder</strong> Nudi ASCII is encoded text, not Unicode. Apply a compatible legacy Nudi font in your document editor. Use Unicode output for websites, messaging apps and modern platforms.</p></div>
+</section>
+<section class="bottom-grid"><div class="bottom-heading"><span class="kicker">A SMALL TOOL WITH A SPECIFIC JOB</span><h2>Keep Kannada<br>moving forward.</h2><p>Built for the everyday bridge between legacy desktop publishing and modern digital text.</p></div><div class="feature-stack"><article><span>01</span><div><h3>Type in Kannada</h3><p>Use the Nudi-style keyboard in the Unicode input. F9 toggles English and Kannada.</p></div><b>↗</b></article><article><span>02</span><div><h3>Convert both ways</h3><p>Move Unicode text to legacy Nudi encoding, or recover Unicode from legacy text.</p></div><b>↗</b></article><article><span>03</span><div><h3>Take it with you</h3><p>Copy the result or export a plain-text file for your existing workflow.</p></div><b>↗</b></article></div></section>
+</main>
+<footer><span>AKSHARA / KANNADA CONVERSION LAB</span><span>Conversion engine attribution: Sanchaya · GPL-3.0</span></footer>
+<div id="toast" role="status"></div>
 <script src="js/nudi-keyboard.js"></script><script src="app.js"></script>
 </body></html>
