@@ -94,77 +94,104 @@
     const layout = await response.json();
     const engine = createEngine(layout);
     let kannadaMode = true;
+    let pendingRange = null;
     let lastCaret = textarea.selectionStart;
-    let commitTimer = null;
-    const COMMIT_DELAY = 250;
 
-    function scheduleCommit() {
-      clearTimeout(commitTimer);
-      commitTimer = setTimeout(() => {
-        const committed = engine.flush();
-        if (committed) insert(committed);
-      }, COMMIT_DELAY);
+    function removePendingPreview() {
+      if (!pendingRange) return;
+      const { start, end } = pendingRange;
+      const value = textarea.value;
+      textarea.value = value.slice(0, start) + value.slice(end);
+      textarea.setSelectionRange(start, start);
+      pendingRange = null;
     }
 
-    function insert(text) {
-      if (!text) return;
+    function insertCommittedAndPreview(committed) {
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
+      const preview = engine.pendingPreview();
+      const text = committed + preview;
       textarea.setRangeText(text, start, end, "end");
+      if (preview) {
+        pendingRange = {
+          start: start + committed.length,
+          end: start + committed.length + preview.length
+        };
+      }
       lastCaret = textarea.selectionStart;
       textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    function committedText() {
+      if (!pendingRange) return textarea.value;
+      const value = textarea.value;
+      return value.slice(0, pendingRange.start) + value.slice(pendingRange.end);
     }
 
     textarea.addEventListener("keydown", event => {
       if (event.key === "F9") {
         event.preventDefault();
+        removePendingPreview();
         kannadaMode = !kannadaMode;
-        clearTimeout(commitTimer);
         engine.reset();
         onStatus?.(kannadaMode ? "NUDI / KANNADA ON" : "ENGLISH ON");
+        textarea.dispatchEvent(new Event("input", { bubbles: true }));
         return;
       }
-      if (!kannadaMode || event.ctrlKey || event.metaKey || event.altKey) return;
 
-      if (textarea.selectionStart !== lastCaret) { clearTimeout(commitTimer); engine.reset(); }
+      if (!kannadaMode || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.key === "Tab") return;
+
+      if (textarea.selectionStart !== lastCaret && !pendingRange) {
+        engine.reset();
+      }
 
       if (event.code === "Backspace") {
-        if (engine.backspace()) {
+        if (engine.hasPending()) {
           event.preventDefault();
-          clearTimeout(commitTimer);
+          removePendingPreview();
+          engine.backspace();
           lastCaret = textarea.selectionStart;
-          return;
+          textarea.dispatchEvent(new Event("input", { bubbles: true }));
         }
         return;
       }
 
       const code = CODE_MAP[event.code];
       if (code === undefined) return;
-
       event.preventDefault();
-      if (code === 49 || code === 36) {
-        insert(engine.flush() + (code === 49 ? " " : "\n"));
-        return;
-      }
-      if (code === 48) {
-        insert(engine.flush() + "\t");
-        return;
-      }
-      clearTimeout(commitTimer);
+
+      // The visible preview is only a display of the pending state.
+      // Remove it before feeding the next key into the state machine.
+      removePendingPreview();
+
       const output = engine.press(code, event.shiftKey);
-      insert(output);
-      lastCaret = textarea.selectionStart;
-      if (engine.hasPending()) scheduleCommit();
+      insertCommittedAndPreview(output);
     });
 
     textarea.addEventListener("click", () => {
-      clearTimeout(commitTimer);
-      if (textarea.selectionStart !== lastCaret) engine.reset();
+      if (pendingRange && textarea.selectionStart !== pendingRange.end) {
+        // A click away commits the visible preview as ordinary text.
+        pendingRange = null;
+        engine.reset();
+      }
       lastCaret = textarea.selectionStart;
     });
-    textarea.addEventListener("keyup", () => { lastCaret = textarea.selectionStart; });
+
+    textarea.addEventListener("input", () => {
+      lastCaret = textarea.selectionStart;
+    });
+
     onStatus?.("NUDI / KANNADA ON");
-    return { setKannadaMode(value) { kannadaMode = !!value; engine.reset(); }, getKannadaMode() { return kannadaMode; } };
+    return {
+      getCommittedText: committedText,
+      setKannadaMode(value) {
+        removePendingPreview();
+        kannadaMode = !!value;
+        engine.reset();
+      },
+      getKannadaMode() { return kannadaMode; }
+    };
   }
 
   window.NudiKeyboard = { init };
