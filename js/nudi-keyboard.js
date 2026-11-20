@@ -84,6 +84,7 @@
         return "";
       },
       reset() { this.seq = null; this.state = "none"; },
+      pendingPreview() {\n        if (this.seq !== null) return this.seq;\n        return this.state === "none" ? "" : (layout.terminators[this.state] || "");\n      },
       hasPending() { return this.seq !== null || this.state !== "none"; }
     };
   }
