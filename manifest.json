@@ -5,19 +5,33 @@
   "description": "Mudra Mod by ZyrexCore: configurable WhatsApp commands, custom assets and optional Kannada to Nudi 5.0 conversion.",
   "permissions": ["storage"],
   "host_permissions": ["https://discord.com/api/webhooks/*"],
-  "icons": {"16":"icon.png","32":"icon.png","48":"icon.png","128":"icon.png"},
+  "icons": {
+    "16": "Assets/icon.png",
+    "32": "Assets/icon.png",
+    "48": "Assets/icon.png",
+    "128": "Assets/icon.png"
+  },
   "action": {
     "default_popup": "popup.html",
-    "default_icon": {"16":"icon.png","32":"icon.png","48":"icon.png","128":"icon.png"},
+    "default_icon": {
+      "16": "Assets/icon.png",
+      "32": "Assets/icon.png",
+      "48": "Assets/icon.png",
+      "128": "Assets/icon.png"
+    },
     "default_title": "Bleeeeh :p"
   },
   "content_scripts": [{
     "matches": ["https://web.whatsapp.com/*"],
-    "js": ["config.js","content.js"],
+    "js": ["config.js", "content.js"],
     "run_at": "document_idle"
   }],
   "web_accessible_resources": [{
-    "resources": ["review-qr.png","payment-qr.png","icon.png"],
+    "resources": [
+      "Assets/review-qr.jpeg",
+      "Assets/payment-qr.png",
+      "Assets/icon.png"
+    ],
     "matches": ["https://web.whatsapp.com/*"]
   }]
 }
