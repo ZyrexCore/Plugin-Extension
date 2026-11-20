@@ -15,6 +15,15 @@
   };
 
   function createEngine(layout) {
+    // The KGP data marks a consonant+virama terminator with U+200C (ZWNJ).
+    // That character explicitly blocks the next consonant from forming an
+    // ottakshara. Nudi typing uses the virama as a joiner, so remove the
+    // non-joiner only when committing a pending halant state.
+    function terminator(state) {
+      const value = layout.terminators[state] || "";
+      return state && state.endsWith("್") ? value.replace(/[\u200C\u200D]/g, "") : value;
+    }
+
     return {
       state: "none",
       seq: null,
@@ -24,7 +33,7 @@
         let out = "";
         if (entry.type === "output") {
           if (this.state !== "none") {
-            out += layout.terminators[this.state] || "";
+            out += terminator(this.state);
             this.state = "none";
           }
           return out + entry.value;
@@ -34,7 +43,7 @@
         let action = table[this.state];
         if (!action) {
           if (this.state !== "none") {
-            out += layout.terminators[this.state] || "";
+            out += terminator(this.state);
             this.state = "none";
           }
           action = table.none;
@@ -77,7 +86,7 @@
           return out;
         }
         if (this.state !== "none") {
-          const out = layout.terminators[this.state] || "";
+          const out = terminator(this.state);
           this.state = "none";
           return out;
         }
@@ -86,7 +95,7 @@
       reset() { this.seq = null; this.state = "none"; },
       pendingPreview() {
         if (this.seq !== null) return this.seq;
-        return this.state === "none" ? "" : (layout.terminators[this.state] || "");
+        return this.state === "none" ? "" : (terminator(this.state));
       },
       hasPending() { return this.seq !== null || this.state !== "none"; }
     };
