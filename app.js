@@ -5,9 +5,10 @@
   const toast = document.getElementById('toast');
   const status = document.querySelector('.live-dot');
   let toastTimer;
+  let keyboard = null;
 
   function encode() {
-    const value = source.value;
+    const value = keyboard ? keyboard.getCommittedText() : source.value;
     try {
       ascii.value = unicodeToASCII(value, 'nudi');
       preview.textContent = value || 'ನಿಮ್ಮ ಕನ್ನಡ ಪಠ್ಯ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ…';
@@ -56,7 +57,8 @@
     if (status) status.textContent = message;
     if (message === 'ENGLISH ON') showToast('English typing enabled · Press F9 for Kannada');
     else if (message === 'NUDI / KANNADA ON') showToast('Nudi keyboard enabled · Press F9 for English');
-  }).then(() => {
+  }).then(instance => {
+    keyboard = instance;
     encode();
     source.focus();
   }).catch(error => {
