@@ -136,9 +136,11 @@
     }
 
     function committedText() {
-      if (!pendingRange) return textarea.value;
-      const value = textarea.value;
-      return value.slice(0, pendingRange.start) + value.slice(pendingRange.end);
+      // Include the currently visible composition preview. It represents the
+      // active consonant/halant in the Unicode input and must be encoded too.
+      // The next keystroke removes this preview and lets the state machine
+      // replace it with the completed ottakshara or vowel combination.
+      return textarea.value;
     }
 
     textarea.addEventListener("keydown", event => {
