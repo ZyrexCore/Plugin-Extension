@@ -18,19 +18,19 @@
 <body>
 <header class="topbar">
   <a class="brand" href="./"><span class="brand-mark">ನು</span><span>NUDI<span class="brand-light">WEB</span><small>KANNADA ASCII EDITOR</small></span></a>
-  <div class="top-actions"><span class="live-dot">ENGINE READY</span><button id="themeBtn" class="icon-btn" aria-label="Toggle theme">◐</button></div>
+  <div class="top-actions"><span class="live-dot">LOADING NUDI KEYBOARD…</span><button id="themeBtn" class="icon-btn" aria-label="Toggle theme">◐</button></div>
 </header>
 <main>
   <section class="intro">
     <div class="eyebrow"><span></span> KGP / NUDI KEYBOARD</div>
     <h1>Type Kannada.<br><em>Keep it Nudi.</em></h1>
-    <p>A browser-based Nudi-style typing workspace. Use the KGP keyboard method and get legacy Nudi ASCII output — not English translation.</p>
+    <p>Type directly with the same physical key positions and Shift combinations used in Nudi 5.0. Kannada appears as you type, with legacy Nudi ASCII output ready to copy.</p>
   </section>
   <section class="workspace">
     <div class="workspace-head"><div><span class="section-kicker">01 / INPUT</span><h2>Kannada typing area</h2></div><div class="keyboard-select"><label for="keyboard">INPUT METHOD</label><select id="keyboard"><option value="kn-kgp">KGP / Nudi</option></select></div></div>
     <div class="editor-wrap">
-      <div class="editor-label"><span><b class="status-dot"></b> KGP INPUT</span><span class="hint">Type with your regular keyboard</span></div>
-      <textarea id="source" spellcheck="false" placeholder="Start typing here using the KGP / Nudi keyboard layout…"></textarea>
+      <div class="editor-label"><span><b class="status-dot"></b> NUDI 5.0 INPUT</span><span class="hint">Type directly · F9 switches Kannada / English</span></div>
+      <textarea id="source" spellcheck="false" placeholder="Click here and type using your Nudi 5.0 keyboard layout…"></textarea>
       <div class="editor-foot"><span id="inputCount">0 characters</span><button id="clearBtn" class="text-btn">CLEAR INPUT ↗</button></div>
     </div>
     <div class="conversion-line"><span></span><div>LIVE ENCODING <b>↓</b></div><span></span></div>
@@ -55,6 +55,6 @@
 </main>
 <footer><span>NUDI WEB · KANNADA ASCII WORKSPACE</span><span>Powered by the open-source Sanchaya Nudi conversion engine · GPL-3.0</span></footer>
 <div id="toast" role="status"></div>
-<script src="app.js"></script>
+<script src="js/nudi-keyboard.js"></script>\n<script src="app.js"></script>
 </body>
 </html>
