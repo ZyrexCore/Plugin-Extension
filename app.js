@@ -33,11 +33,15 @@
       if (mode === 'u2a') {
         const input = unicodeInput.value;
         asciiOutput.value = input ? unicodeToASCII(input, 'nudi') : '';
+        asciiOutput.classList.remove('hidden');
+        unicodeOutput.classList.add('hidden');
         $('resultCount').textContent = asciiOutput.value.length + ' characters';
         $('resultLabel').textContent = 'NUDI LEGACY TEXT';
       } else {
         const input = asciiInput.value;
         unicodeOutput.value = input ? asciiToUnicode(input, false, 'nudi') : '';
+        unicodeOutput.classList.remove('hidden');
+        asciiOutput.classList.add('hidden');
         $('resultCount').textContent = unicodeOutput.value.length + ' characters';
         $('resultLabel').textContent = 'UNICODE KANNADA';
       }
