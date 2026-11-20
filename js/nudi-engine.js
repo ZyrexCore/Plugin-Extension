@@ -1411,38 +1411,73 @@ function unicodeToASCII(text, fontType = 'nudi') {
         return unicodeToWinkey(text);
     }
 
-    const ASCII_DEERGA = "Ã";
-    const ASCII_VATT = "ÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæèéêëìíî";
-    
-    // Handle vowel signs with vattakshara reordering
-    result = result.replace(new RegExp(`([ೆೇೊ])([${ASCII_VATT}])`, 'g'), '$2$1');
-    
-    // Build reverse mapping
-    const U2A_MAP = {};
-    Object.entries(A2U_MAP).forEach(([k, v]) => U2A_MAP[v] = k);
-    
-    // Sort by length (longest first) - explicit comparator needed for Unicode
-    const U2A_KEYS = Object.keys(U2A_MAP).sort((a, b) => b.length - a.length);
-    
-    // Replace using regex to handle overlapping matches properly
-    for (const key of U2A_KEYS) {
-        if (key.length > 0) {
-            const regex = new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-            result = result.replace(regex, U2A_MAP[key]);
-        }
+    // Nudi Mono encoder. Encode Unicode akshara clusters instead of doing
+    // blind reverse substitutions: conjuncts require a base glyph followed
+    // by Nudi's dedicated vattakshara marker bytes.
+    const reverse = new Map();
+    for (const [ascii, unicode] of Object.entries(A2U_MAP)) {
+        if (!reverse.has(unicode)) reverse.set(unicode, ascii);
     }
-    
-    // Replace halant
-    result = result.split('್').join('ï');
+    const vattuReverse = new Map();
+    for (const [ascii, unicode] of Object.entries(VATTAKSHARA_MAP)) {
+        if (!vattuReverse.has(unicode.replace(/್$/, ''))) vattuReverse.set(unicode.replace(/್$/, ''), ascii);
+    }
 
-    // Convert numbers
-    result = result.replace(/[೦-೯]/g, (c) => EN_DIGITS['೦೧೨೩೪೫೬೭೮೯'.indexOf(c)]);
+    const consonant = /^[ಕ-ಹಳೞ]$/;
+    const vowelSigns = new Set(['ಾ','ಿ','ೀ','ು','ೂ','ೃ','ೄ','ೆ','ೇ','ೈ','ೊ','ೋ','ೌ']);
+    const independentVowels = new Set(['ಅ','ಆ','ಇ','ಈ','ಉ','ಊ','ಋ','ೠ','ಎ','ಏ','ಐ','ಒ','ಓ','ಔ']);
+    const output = [];
+    const chars = Array.from(text);
+    let i = 0;
 
-    // Emit MICRO SIGN (U+00B5, valid windows-1252) instead of GREEK SMALL MU
-    // (U+03BC) so the ASCII output is byte-accurate for legacy Nudi tools.
-    result = result.replace(/μ/g, 'µ');
+    while (i < chars.length) {
+        const ch = chars[i];
+        if (consonant.test(ch)) {
+            const cluster = [ch];
+            i++;
+            let conjuncts = [];
+            while (chars[i] === '್' && consonant.test(chars[i + 1] || '')) {
+                conjuncts.push(chars[i + 1]);
+                i += 2;
+            }
+            const vowel = vowelSigns.has(chars[i]) ? chars[i++] : '';
+            if (conjuncts.length) {
+                // The Nudi A2U pipeline expects the base+matra first, then
+                // the vattu bytes; its conjunct pass moves the matra to the
+                // final subjoined consonant.
+                output.push(reverse.get(ch + vowel) || reverse.get(ch) || ch);
+                for (const sub of conjuncts) {
+                    output.push(vattuReverse.get(sub) || ('ï' + (reverse.get(sub) || sub)));
+                }
+            } else if (chars[i] === '್') {
+                output.push(reverse.get(ch + '್') || ((reverse.get(ch) || ch) + 'ï'));
+                i++;
+            } else {
+                output.push(reverse.get(ch + vowel) || reverse.get(ch) || ch);
+            }
+            continue;
+        }
+        if (independentVowels.has(ch)) {
+            output.push(reverse.get(ch) || ch);
+            i++;
+            continue;
+        }
+        if (/[೦-೯]/.test(ch)) {
+            output.push(EN_DIGITS['೦೧೨೩೪೫೬೭೮೯'.indexOf(ch)]);
+            i++;
+            continue;
+        }
+        if (ch === 'ಂ' || ch === 'ಃ') {
+            output.push(reverse.get(ch) || ch);
+            i++;
+            continue;
+        }
+        output.push(ch);
+        i++;
+    }
 
-    return result;
+    // Preserve the Windows-1252 byte used by legacy Nudi tools for ಷ.
+    return output.join('').replace(/μ/g, 'µ');
 }
 
 // ============================================================
