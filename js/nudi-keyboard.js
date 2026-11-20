@@ -95,6 +95,16 @@
     const engine = createEngine(layout);
     let kannadaMode = true;
     let lastCaret = textarea.selectionStart;
+    let commitTimer = null;
+    const COMMIT_DELAY = 250;
+
+    function scheduleCommit() {
+      clearTimeout(commitTimer);
+      commitTimer = setTimeout(() => {
+        const committed = engine.flush();
+        if (committed) insert(committed);
+      }, COMMIT_DELAY);
+    }
 
     function insert(text) {
       if (!text) return;
@@ -109,17 +119,19 @@
       if (event.key === "F9") {
         event.preventDefault();
         kannadaMode = !kannadaMode;
+        clearTimeout(commitTimer);
         engine.reset();
         onStatus?.(kannadaMode ? "NUDI / KANNADA ON" : "ENGLISH ON");
         return;
       }
       if (!kannadaMode || event.ctrlKey || event.metaKey || event.altKey) return;
 
-      if (textarea.selectionStart !== lastCaret) engine.reset();
+      if (textarea.selectionStart !== lastCaret) { clearTimeout(commitTimer); engine.reset(); }
 
       if (event.code === "Backspace") {
         if (engine.backspace()) {
           event.preventDefault();
+          clearTimeout(commitTimer);
           lastCaret = textarea.selectionStart;
           return;
         }
@@ -138,12 +150,15 @@
         insert(engine.flush() + "\t");
         return;
       }
+      clearTimeout(commitTimer);
       const output = engine.press(code, event.shiftKey);
       insert(output);
       lastCaret = textarea.selectionStart;
+      if (engine.hasPending()) scheduleCommit();
     });
 
     textarea.addEventListener("click", () => {
+      clearTimeout(commitTimer);
       if (textarea.selectionStart !== lastCaret) engine.reset();
       lastCaret = textarea.selectionStart;
     });
