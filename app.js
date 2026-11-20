@@ -1,113 +1,38 @@
 (() => {
   const $ = id => document.getElementById(id);
-  const unicodeInput = $('unicodeInput');
-  const asciiInput = $('asciiInput');
-  const unicodeOutput = $('unicodeOutput');
-  const asciiOutput = $('asciiOutput');
-  const toast = $('toast');
-  const status = $('keyboardStatus');
-  let mode = 'u2a';
-  let toastTimer;
-  let keyboard = null;
-
-  function notify(message) {
-    toast.textContent = message;
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+  const unicodeInput=$('unicodeInput'), asciiInput=$('asciiInput');
+  const unicodeOutput=$('unicodeOutput'), asciiOutput=$('asciiOutput');
+  const toast=$('toast'), status=$('keyboardStatus');
+  const STORAGE_KEY='akshara.workspace.v1';
+  let mode='u2a', toastTimer, keyboard=null, autoTimer=null, docs=[], activeId=null, restoring=false;
+  const makeId=()=> 'f'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  function notify(message){toast.textContent=message;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),2200);}
+  function save(){if(restoring)return;const d=docs.find(x=>x.id===activeId);if(d){d.unicode=unicodeInput.value;d.ascii=asciiInput.value;d.mode=mode;}try{localStorage.setItem(STORAGE_KEY,JSON.stringify({docs,activeId}));}catch(e){notify('Could not save workspace in this browser');}}
+  function renderFiles(){
+    const list=$('fileList');list.replaceChildren();
+    docs.forEach((d,i)=>{const b=document.createElement('button');b.className='file-tab'+(d.id===activeId?' active':'');b.type='button';b.title=d.name;b.innerHTML='<span class="file-icon">▤</span><span class="file-tab-name"></span><span class="file-tab-index"></span>';b.querySelector('.file-tab-name').textContent=d.name;b.querySelector('.file-tab-index').textContent=String(i+1).padStart(2,'0');b.addEventListener('click',()=>switchFile(d.id));list.append(b);});
+    $('activeFileName').textContent=(docs.find(d=>d.id===activeId)||{}).name||'Untitled';
   }
-  function setMode(next) {
-    mode = next;
-    document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-    $('unicodePanel').classList.toggle('hidden', mode === 'a2u');
-    $('asciiPanel').classList.toggle('hidden', mode === 'u2a');
-    $('directionTitle').textContent = mode === 'u2a' ? 'Unicode Kannada → Nudi ASCII' : 'Nudi ASCII → Unicode Kannada';
-    $('directionHelp').textContent = mode === 'u2a'
-      ? 'Paste or type Unicode Kannada. Convert it into legacy Nudi text for compatible Nudi fonts.'
-      : 'Paste legacy Nudi text copied from an older document. Convert it into readable Unicode Kannada.';
-    $('convertBtn').textContent = mode === 'u2a' ? 'Convert to Nudi ASCII' : 'Convert to Unicode';
-    $('copyResult').textContent = mode === 'u2a' ? 'Copy Nudi ASCII' : 'Copy Unicode';
-  }
-  function convertNow() {
-    try {
-      if (mode === 'u2a') {
-        const input = unicodeInput.value;
-        asciiOutput.value = input ? unicodeToASCII(input, 'nudi') : '';
-        asciiOutput.classList.remove('hidden');
-        unicodeOutput.classList.add('hidden');
-        $('resultCount').textContent = asciiOutput.value.length + ' characters';
-        $('resultLabel').textContent = 'NUDI LEGACY TEXT';
-      } else {
-        const input = asciiInput.value;
-        unicodeOutput.value = input ? asciiToUnicode(input, false, 'nudi') : '';
-        unicodeOutput.classList.remove('hidden');
-        asciiOutput.classList.add('hidden');
-        $('resultCount').textContent = unicodeOutput.value.length + ' characters';
-        $('resultLabel').textContent = 'UNICODE KANNADA';
-      }
-      $('resultPanel').classList.remove('hidden');
-    } catch (e) {
-      console.error(e);
-      notify('Conversion failed: ' + e.message);
-    }
-  }
-  async function copyResult() {
-    const value = mode === 'u2a' ? asciiOutput.value : unicodeOutput.value;
-    if (!value) return notify('Nothing to copy yet');
-    try { await navigator.clipboard.writeText(value); notify('Copied to clipboard'); }
-    catch { notify('Clipboard access was blocked by the browser'); }
-  }
-  function downloadResult() {
-    const value = mode === 'u2a' ? asciiOutput.value : unicodeOutput.value;
-    if (!value) return notify('Nothing to download yet');
-    const blob = new Blob([value], {type:'text/plain;charset=utf-8'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = mode === 'u2a' ? 'nudi-ascii.txt' : 'kannada-unicode.txt';
-    a.click(); URL.revokeObjectURL(url);
-  }
-  $('convertBtn').addEventListener('click', convertNow);
-  $('copyResult').addEventListener('click', copyResult);
-  $('downloadResult').addEventListener('click', downloadResult);
-  document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
-  $('clearBtn').addEventListener('click', () => {
-    unicodeInput.value = ''; asciiInput.value = ''; unicodeOutput.value = ''; asciiOutput.value = '';
-    $('resultPanel').classList.add('hidden'); $('unicodeCount').textContent = '0 characters'; $('asciiCount').textContent = '0 characters';
-    notify('Editor cleared');
-  });
-  $('swapBtn').addEventListener('click', () => {
-    const u = unicodeOutput.value || unicodeInput.value;
-    const a = asciiOutput.value || asciiInput.value;
-    unicodeInput.value = u; asciiInput.value = a;
-    setMode(mode === 'u2a' ? 'a2u' : 'u2a');
-    notify('Conversion direction switched');
-  });
-  $('themeBtn').addEventListener('click', () => document.body.classList.toggle('light'));
-  unicodeInput.addEventListener('input', () => $('unicodeCount').textContent = unicodeInput.value.length + ' characters');
-  asciiInput.addEventListener('input', () => $('asciiCount').textContent = asciiInput.value.length + ' characters');
-  $('sampleBtn').addEventListener('click', () => {
-    if (mode === 'u2a') unicodeInput.value = 'ವ್ಯಾಸರಿಗೆ ತಮ್ಮ ಶಕ್ತಿಯ ಅರಿವಿದ್ದರೂ ಗಣಪತಿಯ ವೇಗಕ್ಕೆ ಕಥೆ ಹೇಳಲು…';
-    else asciiInput.value = 'ªÁå¸ÀjUÉ vÀªÀÄä ±ÀQÛAiÀÄ Cj«zÀÝgÀÆ UÀt¥ÀwAiÀÄ…';
-    convertNow();
-  });
-  $('fileInput').addEventListener('change', async e => {
-    const file = e.target.files[0]; if (!file) return;
-    const text = await file.text();
-    (mode === 'u2a' ? unicodeInput : asciiInput).value = text;
-    convertNow(); e.target.value = '';
-  });
-  $('uploadBtn').addEventListener('click', () => $('fileInput').click());
-
-  NudiKeyboard.init(unicodeInput, message => {
-    status.textContent = message;
-    status.classList.toggle('offline', message === 'ENGLISH ON');
-  }).then(instance => {
-    keyboard = instance;
-    status.textContent = 'NUDI KEYBOARD READY · F9 TOGGLE';
-  }).catch(error => {
-    console.error(error);
-    status.textContent = 'KEYBOARD UNAVAILABLE';
-    status.classList.add('offline');
-  });
-  setMode('u2a');
+  function snapshot(){const d=docs.find(x=>x.id===activeId);if(d){d.unicode=unicodeInput.value;d.ascii=asciiInput.value;d.mode=mode;}}
+  function switchFile(id){snapshot();activeId=id;const d=docs.find(x=>x.id===id);if(!d)return;restoring=true;unicodeInput.value=d.unicode||'';asciiInput.value=d.ascii||'';mode=d.mode||'u2a';$('resultPanel').classList.add('hidden');setMode(mode);updateCounts();restoring=false;renderFiles();convertNow();save();}
+  function createFile(){snapshot();const n=docs.length+1;const d={id:makeId(),name:'Untitled '+n,unicode:'',ascii:'',mode:'u2a'};docs.push(d);activeId=d.id;restoring=true;unicodeInput.value='';asciiInput.value='';mode='u2a';$('resultPanel').classList.add('hidden');setMode(mode);updateCounts();restoring=false;renderFiles();save();unicodeInput.focus();}
+  function deleteFile(){if(docs.length===1){notify('Keep at least one file in your workspace');return;}const i=docs.findIndex(d=>d.id===activeId);docs=docs.filter(d=>d.id!==activeId);const next=docs[Math.max(0,i-1)];activeId=next.id;switchFile(activeId);notify('File deleted');}
+  function setMode(next){mode=next;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));$('unicodePanel').classList.toggle('hidden',mode==='a2u');$('asciiPanel').classList.toggle('hidden',mode==='u2a');$('directionTitle').textContent=mode==='u2a'?'Unicode Kannada → Nudi ASCII':'Nudi ASCII → Unicode Kannada';$('directionHelp').textContent=mode==='u2a'?'Type or paste Unicode Kannada. The Nudi legacy output updates as you work.':'Paste legacy Nudi text. The Unicode result updates as you work.';$('convertBtn').textContent=mode==='u2a'?'Convert to Nudi ASCII':'Convert to Unicode';$('copyResult').textContent=mode==='u2a'?'Copy Nudi ASCII':'Copy Unicode';}
+  function convertNow(){try{if(mode==='u2a'){asciiOutput.value=unicodeInput.value?unicodeToASCII(unicodeInput.value,'nudi'):'';asciiOutput.classList.remove('hidden');unicodeOutput.classList.add('hidden');$('resultCount').textContent=asciiOutput.value.length+' characters';$('resultLabel').textContent='NUDI LEGACY TEXT';}else{unicodeOutput.value=asciiInput.value?asciiToUnicode(asciiInput.value,false,'nudi'):'';unicodeOutput.classList.remove('hidden');asciiOutput.classList.add('hidden');$('resultCount').textContent=unicodeOutput.value.length+' characters';$('resultLabel').textContent='UNICODE KANNADA';}$('resultPanel').classList.remove('hidden');save();}catch(e){console.error(e);notify('Conversion failed: '+e.message);}}
+  function scheduleConvert(){clearTimeout(autoTimer);$('autoStatus').textContent='TYPING…';autoTimer=setTimeout(()=>{convertNow();$('autoStatus').textContent='AUTO CONVERT ON';},180);}
+  function updateCounts(){$('unicodeCount').textContent=unicodeInput.value.length+' characters';$('asciiCount').textContent=asciiInput.value.length+' characters';}
+  async function copyResult(){const v=mode==='u2a'?asciiOutput.value:unicodeOutput.value;if(!v)return notify('Nothing to copy yet');try{await navigator.clipboard.writeText(v);notify('Copied to clipboard');}catch{notify('Clipboard access was blocked by the browser');}}
+  function downloadResult(){const v=mode==='u2a'?asciiOutput.value:unicodeOutput.value;if(!v)return notify('Nothing to download yet');const blob=new Blob([v],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=mode==='u2a'?'nudi-ascii.txt':'kannada-unicode.txt';a.click();URL.revokeObjectURL(url);}
+  function clearEditors(){unicodeInput.value='';asciiInput.value='';unicodeOutput.value='';asciiOutput.value='';$('resultPanel').classList.add('hidden');updateCounts();save();notify('Current file cleared');}
+  $('convertBtn').addEventListener('click',convertNow);$('copyResult').addEventListener('click',copyResult);$('downloadResult').addEventListener('click',downloadResult);
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{setMode(b.dataset.mode);convertNow();}));
+  $('clearBtn').addEventListener('click',clearEditors);$('newFileBtn').addEventListener('click',createFile);$('deleteFileBtn').addEventListener('click',deleteFile);
+  $('swapBtn').addEventListener('click',()=>{const u=asciiOutput.value||unicodeInput.value,a=unicodeOutput.value||asciiInput.value;unicodeInput.value=u;asciiInput.value=a;setMode(mode==='u2a'?'a2u':'u2a');updateCounts();convertNow();});
+  $('themeBtn').addEventListener('click',()=>document.body.classList.toggle('light'));
+  unicodeInput.addEventListener('input',()=>{updateCounts();scheduleConvert();});asciiInput.addEventListener('input',()=>{updateCounts();scheduleConvert();});
+  $('sampleBtn').addEventListener('click',()=>{if(mode==='u2a')unicodeInput.value='ವ್ಯಾಸರಿಗೆ ತಮ್ಮ ಶಕ್ತಿಯ ಅರಿವಿದ್ದರೂ ಗಣಪತಿಯ ವೇಗಕ್ಕೆ ಕಥೆ ಹೇಳಲು…';else asciiInput.value='ªÁå¸ÀjUÉ vÀªÀÄä ±ÀQÛAiÀÄ Cj«zÀÝgÀÆ UÀt¥ÀwAiÀÄ…';updateCounts();convertNow();});
+  $('fileInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;(mode==='u2a'?unicodeInput:asciiInput).value=await f.text();updateCounts();convertNow();e.target.value='';});$('uploadBtn').addEventListener('click',()=>$('fileInput').click());
+  try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');if(saved&&Array.isArray(saved.docs)&&saved.docs.length){docs=saved.docs;activeId=docs.some(d=>d.id===saved.activeId)?saved.activeId:docs[0].id;}else{docs=[{id:makeId(),name:'Untitled 1',unicode:'',ascii:'',mode:'u2a'}];activeId=docs[0].id;}}catch{docs=[{id:makeId(),name:'Untitled 1',unicode:'',ascii:'',mode:'u2a'}];activeId=docs[0].id;}
+  const first=docs.find(d=>d.id===activeId);restoring=true;unicodeInput.value=first.unicode||'';asciiInput.value=first.ascii||'';mode=first.mode||'u2a';setMode(mode);updateCounts();restoring=false;renderFiles();convertNow();
+  NudiKeyboard.init(unicodeInput,message=>{status.textContent=message;status.classList.toggle('offline',message==='ENGLISH ON');}).then(instance=>{keyboard=instance;status.textContent='NUDI KEYBOARD READY · F9 TOGGLE';}).catch(error=>{console.error(error);status.textContent='KEYBOARD UNAVAILABLE';status.classList.add('offline');});
 })();
