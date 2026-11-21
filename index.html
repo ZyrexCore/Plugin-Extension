@@ -2,45 +2,74 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#101116">
-<title>AKSHARA — Nudi Conversion Lab</title>
-<meta name="description" content="A focused Kannada workspace for typing and converting Unicode and legacy Nudi text.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anek+Kannada:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<script src="js/nudi-engine.js"></script>
+<meta name="theme-color" content="#11140f"><meta name="description" content="A simple daily production and paper-material tracker for printing work.">
+<title>Printlog — Printing Work Tracker</title><link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
-<header class="topbar">
-<a class="brand" href="./"><span class="brand-symbol">ಅ</span><span class="brand-copy">AKSHARA<span class="brand-sub">KANNADA CONVERSION LAB</span></span></a>
-<div class="top-actions"><span id="keyboardStatus" class="status">LOADING KEYBOARD…</span><button id="themeBtn" class="theme-btn" aria-label="Toggle light theme"><span>◐</span> <small>THEME</small></button></div>
-</header>
-<main>
-<section class="hero">
-<div class="hero-meta"><span class="eyebrow">TOOLS FOR KANNADA TYPE</span><span class="hero-index">WORKSPACE / 001</span></div>
-<h1>Words have a<br><span>second life.</span></h1>
-<p class="hero-copy">Move between modern Unicode and classic Nudi legacy text. Type, convert, copy — without losing the script you work in.</p>
-<div class="hero-stats"><div><b>01</b><span>TYPE</span></div><i></i><div><b>02</b><span>CONVERT</span></div><i></i><div><b>03</b><span>EXPORT</span></div></div>
+<div class="shell">
+<aside class="sidebar">
+  <a class="brand" href="#"><span class="brand-mark">P</span><span><b>PRINTLOG</b><small>PRODUCTION DESK</small></span></a>
+  <div class="side-label">WORKSPACE</div>
+  <nav>
+    <button class="nav-link active" data-view="dashboard"><span>▦</span> Overview</button>
+    <button class="nav-link" data-view="tasks"><span>☷</span> Work & tasks <i id="pendingBadge">0</i></button>
+    <button class="nav-link" data-view="materials"><span>▤</span> Paper & materials</button>
+    <button class="nav-link" data-view="history"><span>◷</span> Daily history</button>
+  </nav>
+  <div class="sidebar-bottom"><div class="local-dot"></div><div><b>Saved on this device</b><small>Your records stay in this browser</small></div></div>
+</aside>
+<main class="main">
+<header class="topbar"><div><div class="eyebrow">PRINT SHOP / DAILY OPERATIONS</div><h1 id="pageTitle">Overview</h1></div><div class="top-actions"><span class="today-chip" id="todayLabel"></span><button class="btn btn-quiet" id="exportBtn">↓ Export backup</button></div></header>
+<section class="view active" id="view-dashboard">
+  <div class="welcome"><div><div class="eyebrow light">YOUR WORK, IN ONE PLACE</div><h2>Make every print day<br><em>count.</em></h2><p>Keep track of jobs, finished work and every sheet of paper that goes out for printing.</p></div><div class="welcome-stamp">DAILY<br><b>LOG</b><span>✳</span></div></div>
+  <div class="stats-grid">
+    <article class="stat-card"><span>OPEN TASKS</span><b id="statPending">0</b><small>Work still to finish</small></article>
+    <article class="stat-card"><span>FINISHED TODAY</span><b id="statFinished">0</b><small>Tasks completed today</small></article>
+    <article class="stat-card"><span>WORKED ON TODAY</span><b id="statWorked">0</b><small>Daily work notes</small></article>
+    <article class="stat-card"><span>MATERIAL ENTRIES</span><b id="statMaterials">0</b><small>Paper records saved</small></article>
+  </div>
+  <div class="two-col">
+    <section class="panel"><div class="panel-head"><div><div class="eyebrow">TODAY'S PRODUCTION</div><h3>Work log</h3></div><button class="text-btn" data-goto="tasks">Manage work ↗</button></div>
+      <div class="quick-add"><input id="workInput" placeholder="What did you work on today?"><button class="btn btn-primary" id="addWorkBtn">Add note +</button></div>
+      <div id="todayWorkList" class="simple-list"></div>
+    </section>
+    <section class="panel"><div class="panel-head"><div><div class="eyebrow">NEXT UP</div><h3>Pending work</h3></div><span class="count-pill" id="pendingCount">0 OPEN</span></div><div id="dashboardPending" class="task-list compact"></div></section>
+  </div>
+  <section class="panel"><div class="panel-head"><div><div class="eyebrow">PAPER STOCK ACTIVITY</div><h3>Latest material entries</h3></div><button class="text-btn" data-goto="materials">All materials ↗</button></div><div id="recentMaterials" class="table-wrap"></div></section>
 </section>
-<div class="studio-layout">
-<aside class="file-sidebar"><div class="sidebar-head"><span class="kicker">YOUR WORKSPACE</span><button id="newFileBtn" class="new-file-btn" title="Create new file">＋ NEW</button></div><div id="fileList" class="file-list" aria-label="Your files"></div><div class="sidebar-foot">FILES SAVE AUTOMATICALLY<br><span>Only stored in this browser</span></div></aside>
-<section class="workspace">
-<div class="workspace-bar"><div class="workspace-title"><span class="live-mark"></span><div><span class="kicker">ACTIVE FILE · <span id="activeFileName">Untitled 1</span></span><h2 id="directionTitle">Unicode Kannada → Nudi ASCII</h2></div></div><div class="mode-switch"><button data-mode="u2a" class="active">UNICODE <span>→</span> NUDI</button><button data-mode="a2u">NUDI <span>→</span> UNICODE</button></div></div>
-<p id="directionHelp" class="direction-help">Paste or type Unicode Kannada. Convert it into legacy Nudi text for compatible Nudi fonts.</p>
-<div class="toolbar"><div class="toolbar-group"><button id="sampleBtn" class="tool-btn">＋ Sample text</button><button id="uploadBtn" class="tool-btn">↥ Import .txt</button><input id="fileInput" type="file" accept=".txt,text/plain" hidden></div><span class="toolbar-spacer"></span><div class="toolbar-group"><button id="swapBtn" class="tool-btn">⇄ Reverse</button><button id="clearBtn" class="tool-btn clear-btn">Clear all</button><button id="deleteFileBtn" class="tool-btn clear-btn">Delete file</button></div></div>
-<div class="editor-grid">
-<section id="unicodePanel" class="editor-card"><div class="card-head"><div><span class="panel-number">A / INPUT</span><h3>ಕನ್ನಡ ಪಠ್ಯ <small>Unicode source</small></h3></div><span class="format-tag">UNICODE</span></div><textarea id="unicodeInput" spellcheck="false" placeholder="ಇಲ್ಲಿ ಕನ್ನಡ ಪಠ್ಯವನ್ನು ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಅಂಟಿಸಿ…"></textarea><div class="card-foot"><span id="unicodeCount">0 characters</span><span class="keyboard-hint">⌨ F9 <b>Switch Kannada / English</b></span></div></section>
-<section id="asciiPanel" class="editor-card hidden"><div class="card-head"><div><span class="panel-number">A / INPUT</span><h3>Nudi legacy text <small>Encoded source</small></h3></div><span class="format-tag legacy">LEGACY</span></div><textarea id="asciiInput" spellcheck="false" placeholder="Paste legacy Nudi ASCII text here…"></textarea><div class="card-foot"><span id="asciiCount">0 characters</span><span class="keyboard-hint">PASTE <b>Existing Nudi text</b></span></div></section>
-<div class="convert-action"><div class="convert-rule"></div><button id="convertBtn" class="convert-btn">Convert to Nudi ASCII <span>↗</span></button><span class="auto-status" id="autoStatus">AUTO CONVERT ON</span><div class="convert-rule"></div></div>
-<section id="resultPanel" class="result-card hidden"><div class="card-head"><div><span class="panel-number">B / OUTPUT</span><h3 id="resultLabel">NUDI LEGACY TEXT</h3></div><span id="resultCount" class="result-count">0 characters</span></div><textarea id="asciiOutput" readonly spellcheck="false" placeholder="Your converted text will appear here…"></textarea><textarea id="unicodeOutput" readonly spellcheck="false" placeholder="Unicode Kannada result…" class="hidden"></textarea><div class="result-actions"><span class="result-note">Review your result before using it in another application.</span><div><button id="copyResult" class="tool-btn copy-btn">Copy Nudi ASCII</button><button id="downloadResult" class="download-btn">Download .TXT ↓</button></div></div></section>
-</div>
-<div class="compat-note"><span class="note-mark">i</span><p><strong>Legacy font reminder</strong> Nudi ASCII is encoded text, not Unicode. Apply a compatible legacy Nudi font in your document editor. Use Unicode output for websites, messaging apps and modern platforms.</p></div>
+<section class="view" id="view-tasks">
+  <div class="section-intro"><div><div class="eyebrow">DAILY PRODUCTION</div><h2>Work & tasks</h2><p>Add jobs as you start them. Mark them finished when done.</p></div><span class="date-chip" id="taskDateLabel"></span></div>
+  <div class="two-col task-columns">
+    <section class="panel"><div class="panel-head"><div><div class="eyebrow">IN PROGRESS</div><h3>Worked on / pending</h3></div><span class="count-pill" id="openCount">0 OPEN</span></div>
+      <form id="taskForm" class="stack-form"><label>New job / task<input id="taskInput" required placeholder="e.g. Wedding invitation — 500 copies"></label><label>Notes (optional)<input id="taskNote" placeholder="Size, customer, details..."></label><button class="btn btn-primary" type="submit">＋ Add task</button></form>
+      <div id="openTasks" class="task-list"></div>
+    </section>
+    <section class="panel"><div class="panel-head"><div><div class="eyebrow">COMPLETED</div><h3>Finished work</h3></div><span class="count-pill success" id="doneCount">0 DONE</span></div><div id="doneTasks" class="task-list"></div></section>
+  </div>
+  <section class="panel"><div class="panel-head"><div><div class="eyebrow">DAILY NOTES</div><h3>What I worked on</h3></div></div><form id="noteForm" class="quick-add"><input id="dailyNoteInput" placeholder="Add a work update for today..."><button class="btn btn-primary">Add update +</button></form><div id="dailyNotes" class="simple-list"></div></section>
 </section>
-</div>
-<section class="bottom-grid"><div class="bottom-heading"><span class="kicker">A SMALL TOOL WITH A SPECIFIC JOB</span><h2>Keep Kannada<br>moving forward.</h2><p>Built for the everyday bridge between legacy desktop publishing and modern digital text.</p></div><div class="feature-stack"><article><span>01</span><div><h3>Type in Kannada</h3><p>Use the Nudi-style keyboard in the Unicode input. F9 toggles English and Kannada.</p></div><b>↗</b></article><article><span>02</span><div><h3>Convert both ways</h3><p>Move Unicode text to legacy Nudi encoding, or recover Unicode from legacy text.</p></div><b>↗</b></article><article><span>03</span><div><h3>Take it with you</h3><p>Copy the result or export a plain-text file for your existing workflow.</p></div><b>↗</b></article></div></section>
+<section class="view" id="view-materials">
+  <div class="section-intro"><div><div class="eyebrow">PAPER & CONSUMABLES</div><h2>Material register</h2><p>Record the paper type, GSM, quantity and where it was sent.</p></div><span class="date-chip">STOCK / JOB RECORDS</span></div>
+  <section class="panel"><div class="panel-head"><div><div class="eyebrow">NEW ENTRY</div><h3>Add printing material</h3></div></div>
+  <form id="materialForm" class="material-form">
+    <label>Paper name / GSM<select id="paperType"><option>300 GSM</option><option>250 GSM</option><option>200 GSM</option><option>170 GSM</option><option>150 GSM</option><option>130 GSM</option><option>120 GSM</option><option>100 GSM</option><option>80 GSM</option><option>Other</option></select></label>
+    <label>Custom paper name<input id="customPaper" placeholder="If other..." disabled></label>
+    <label>Quantity<input id="paperQty" type="number" min="0.01" step="any" required placeholder="e.g. 500"></label>
+    <label>Unit<select id="paperUnit"><option>Sheets</option><option>Packets</option><option>Kg</option><option>Rolls</option><option>Bundles</option></select></label>
+    <label>Paper size<input id="paperSize" placeholder="A4, 12×18, 20×30..."></label>
+    <label>Supplier / printer<input id="paperSupplier" placeholder="Name (optional)"></label>
+    <label class="wide">Purpose / job<input id="paperPurpose" placeholder="Which job was this material for?"></label>
+    <button class="btn btn-primary" type="submit">Save material entry ↗</button>
+  </form></section>
+  <section class="panel"><div class="panel-head"><div><div class="eyebrow">REGISTER</div><h3>Material history</h3></div><span class="count-pill" id="materialCount">0 ENTRIES</span></div><div id="materialsTable" class="table-wrap"></div></section>
+</section>
+<section class="view" id="view-history">
+  <div class="section-intro"><div><div class="eyebrow">YOUR RECORDS</div><h2>Daily history</h2><p>Look back at your work and completed jobs by date.</p></div><input class="search-input" id="historySearch" placeholder="Search work or date..."></div>
+  <div id="historyList" class="history-list"></div>
+</section>
+<footer><span>PRINTLOG <b>·</b> PRINTING WORK TRACKER</span><span>Built for the everyday print floor.</span></footer>
 </main>
-<footer><span>AKSHARA / KANNADA CONVERSION LAB</span><span>Conversion engine attribution: Sanchaya · GPL-3.0</span></footer>
+</div>
 <div id="toast" role="status"></div>
-<script src="js/nudi-keyboard.js"></script><script src="app.js"></script>
+<script src="app.js"></script>
 </body></html>

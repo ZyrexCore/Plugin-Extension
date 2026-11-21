@@ -1,16 +1,24 @@
-# Nudi Web — Kannada ASCII Typing
+# Printlog — Printing Work Tracker
 
-A browser-based Kannada typing workspace using the **KGP / Nudi keyboard layout** and converting Unicode Kannada text into **legacy Nudi ASCII encoding**. This is a keyboard-layout editor, not English-to-Kannada transliteration.
+A lightweight daily production tracker for a print shop, published with GitHub Pages.
 
-## Run locally
-Open `index.html` in a modern browser. An internet connection is required for Wikimedia jQuery.IME assets and Google Fonts.
+## Features
+- Daily work updates and task list
+- Mark jobs finished; pending tasks automatically carry forward to the current day when the app is opened
+- Paper/material register with GSM, quantity, unit, size, supplier and job purpose
+- Daily history and search
+- JSON backup export
+- Responsive desktop and mobile layout
 
-## GitHub Pages
-In repository Settings → Pages, choose **Deploy from a branch**, select `main` and `/ (root)`, then save.
+## Deploy
+This repository includes a GitHub Actions workflow at `.github/workflows/pages.yml`.
+1. Open **Settings → Pages** in the repository.
+2. Set **Build and deployment → Source** to **GitHub Actions**.
+3. Pushes to `main` deploy the website automatically.
+4. Open the Pages URL shown in Settings → Pages.
 
-## Notes
-- Input method: `kn-kgp` (KGP keyboard layout via Wikimedia jQuery.IME).
-- Output: legacy Nudi byte-position encoding using the included Sanchaya conversion engine.
-- Unicode preview is shown separately for proofreading.
-- Use legacy ASCII output with a compatible Nudi font/editor.
-- Conversion engine is distributed under GPL-3.0-or-later; see [LICENSE](LICENSE) and the source header for attribution.
+## Data storage note
+The first version saves records in the browser's local storage on the device/browser where you use it. Export a JSON backup regularly. Records do not automatically sync between different devices or browsers. A shared cloud database (for example Supabase) can be connected in a later step if multi-device access is needed.
+
+## Pending task behaviour
+Unfinished tasks keep their original creation date for history, while their active date is moved forward to the current day on app startup. The task is never duplicated. Completing it marks the same task as finished.
