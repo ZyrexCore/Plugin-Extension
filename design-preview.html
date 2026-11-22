@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#20271f">
+<meta name="description" content="PRINTLOG visual concept preview — a daily production workspace for print shops.">
+<title>PRINTLOG — Visual Concept Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f5f0;--surface:#fff;--ink:#20271f;--muted:#818a7d;--line:#e7ebe3;--green:#456b36;--green2:#2d3c2a;--lime:#d9f17b;--soft:#eef3e9;--amber:#d58a54;--red:#bd695b;--mono:"DM Mono",monospace;--sans:"Manrope",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px var(--sans)}button,input,select{font:inherit}button{cursor:pointer}.app{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:238px;background:var(--ink);color:#f6f7f1;padding:25px 17px;display:flex;flex-direction:column;z-index:5}.brand{display:flex;align-items:center;gap:11px;padding:2px 8px 36px}.brand-mark{width:39px;height:39px;border-radius:12px;background:var(--lime);color:var(--ink);display:grid;place-items:center;font-size:22px;font-weight:800}.brand-name{font-size:12px;font-weight:800;letter-spacing:.16em}.brand-sub{font:8px var(--mono);letter-spacing:.12em;color:#aab5a3;margin-top:4px}.nav-label,.eyebrow{font:9px var(--mono);letter-spacing:.14em;color:#87917f}.nav-label{padding:0 10px 12px;color:#9ca694}.nav{display:grid;gap:5px}.nav button{height:43px;border:0;border-radius:8px;background:transparent;color:#c5cdbf;text-align:left;padding:0 11px;display:flex;align-items:center;gap:12px;font-size:11px;font-weight:700}.nav button span{width:17px;text-align:center;font-size:16px}.nav button.active,.nav button:hover{background:#354432;color:#e9f6d0}.nav button i{font:9px var(--mono);font-style:normal;margin-left:auto;background:#536849;padding:3px 7px;border-radius:20px}.sidebar-bottom{margin-top:auto;border-top:1px solid #3a4637;padding:16px 5px 0;display:flex;align-items:center;gap:10px}.dot{width:8px;height:8px;border-radius:50%;background:#a8d574;box-shadow:0 0 0 4px #a8d57420}.sidebar-bottom b,.sidebar-bottom small{display:block}.sidebar-bottom b{font-size:10px}.sidebar-bottom small{font-size:9px;color:#aab5a3;margin-top:3px}.main{margin-left:238px;padding:0 4.2vw;max-width:1600px}.topbar{height:92px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.topbar h1{font-size:22px;letter-spacing:-.055em;margin:5px 0 0}.top-actions{display:flex;align-items:center;gap:10px}.date-chip,.demo-chip{padding:9px 11px;border-radius:6px;font:9px var(--mono)}.date-chip{background:#e9eee4;color:#526348}.demo-chip{background:#fff0e4;color:#9b633c}.btn{border:0;border-radius:7px;padding:11px 15px;font-size:10px;font-weight:800}.btn-primary{background:var(--green);color:white}.btn-primary:hover{background:#35552b}.btn-quiet{background:#fff;border:1px solid var(--line);color:#52604d}.view{display:none;padding:27px 0 42px}.view.active{display:block}.hero{min-height:190px;border-radius:14px;background:linear-gradient(115deg,#293927,#3c5734);color:#f7f8f1;padding:29px 34px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}.hero:before,.hero:after{content:"";position:absolute;border:1px solid #ffffff18;border-radius:50%;width:280px;height:280px;right:80px;top:-190px;box-shadow:0 0 0 35px #ffffff08,0 0 0 70px #ffffff05}.hero:after{width:180px;height:180px;right:-40px;top:95px}.hero-copy{position:relative;z-index:1;max-width:570px}.hero .eyebrow{color:#c8dc9f}.hero h2{font-size:33px;line-height:1.12;letter-spacing:-.065em;margin:12px 0 8px}.hero h2 em{font-style:normal;color:var(--lime)}.hero p{color:#c7d0c1;max-width:440px;font-size:11px;line-height:1.8;margin:0}.hero-mark{position:relative;z-index:1;width:105px;height:105px;border:1px solid #c9d8b47a;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(8deg);font:9px var(--mono);letter-spacing:.13em;color:#d8e1ce}.hero-mark b{font:800 19px var(--sans);color:var(--lime);letter-spacing:.08em}.hero-mark span{font-size:18px;color:var(--lime);margin-top:3px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.stat,.panel{background:var(--surface);border:1px solid var(--line);border-radius:11px}.stat{padding:16px 18px}.stat label{display:block;font:8px var(--mono);letter-spacing:.1em;color:var(--muted)}.stat strong{display:block;font-size:29px;letter-spacing:-.06em;margin:7px 0 1px}.stat small{font-size:9px;color:var(--muted)}.content-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-bottom:14px}.panel{padding:18px 19px;margin-bottom:14px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}.panel-head h3{font-size:15px;letter-spacing:-.04em;margin:5px 0 0}.panel .eyebrow{color:#8a9483}.link-btn{border:0;background:transparent;color:var(--green);font-size:10px;font-weight:800}.quick-add{display:flex;gap:8px}.quick-add input,.field input,.field select,.search{height:39px;border:1px solid var(--line);border-radius:7px;background:#fbfcfa;padding:0 11px;outline:none;color:var(--ink);font-size:10px;min-width:0}.quick-add input{flex:1}.quick-add input:focus,.field input:focus,.field select:focus,.search:focus{border-color:#9db58d;box-shadow:0 0 0 3px #456b3610}.list{display:grid;gap:7px;margin-top:12px}.note-row,.task-row{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:8px;background:#f7f9f5}.note-row{font-size:10px}.note-icon{color:var(--green)}.task-row{align-items:flex-start}.check{width:17px;height:17px;flex:none;border:1px solid #b8c4b1;border-radius:5px;background:white;color:white;font-size:11px;padding:0}.task-row.done .check{background:var(--green);border-color:var(--green)}.task-copy{flex:1;min-width:0}.task-copy b{display:block;font-size:10px;overflow-wrap:anywhere}.task-copy small{display:block;font-size:9px;color:var(--muted);margin-top:4px;line-height:1.5}.task-row.done .task-copy b{text-decoration:line-through;color:#899184}.tag{font:8px var(--mono);color:#9b704d;background:#f7eee5;padding:4px 6px;border-radius:4px;white-space:nowrap}.count{font:8px var(--mono);color:#74806e;background:#f0f3ed;border-radius:20px;padding:6px 8px;white-space:nowrap}.empty{padding:20px 12px;text-align:center;color:#9aa193;font-size:10px;border:1px dashed var(--line);border-radius:8px}.material-table{overflow-x:auto}table{width:100%;border-collapse:collapse;text-align:left;white-space:nowrap}th{font:8px var(--mono);letter-spacing:.1em;color:#899184;padding:10px;border-bottom:1px solid var(--line)}td{font-size:10px;padding:12px 10px;border-bottom:1px solid #eef0eb}.gsm{display:inline-block;padding:5px 7px;border-radius:5px;background:#edf2e8;color:#527043;font:9px var(--mono)}.section-intro{display:flex;justify-content:space-between;align-items:flex-end;margin:4px 0 19px}.section-intro h2{font-size:25px;letter-spacing:-.06em;margin:7px 0 5px}.section-intro p{font-size:10px;color:var(--muted);margin:0}.columns{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}.form-stack{display:grid;gap:10px;padding:13px;background:#f7f9f5;border-radius:9px;margin-bottom:13px}.field{display:grid;gap:6px;font-size:9px;font-weight:800;color:#65705f}.field input,.field select{width:100%;background:#fff}.material-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.wide{grid-column:span 2}.history-list{display:grid;gap:12px}.history-day{background:#fff;border:1px solid var(--line);border-radius:10px;padding:17px 19px}.history-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.history-head b{font-size:12px}.history-head small{font:8px var(--mono);color:var(--muted)}.history-columns{display:grid;grid-template-columns:1fr 1fr;gap:18px}.history-columns h4{font:8px var(--mono);letter-spacing:.1em;color:#87917f;margin:0 0 7px}.history-columns p{font-size:10px;color:#515a4e;margin:5px 0;line-height:1.6}.footer{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:17px 0 23px;color:#939a8e;font:8px var(--mono);letter-spacing:.08em}.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,12px);opacity:0;background:#263b25;color:white;padding:11px 16px;border-radius:7px;font-size:10px;transition:.2s;z-index:20;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}.preview-note{margin:0 0 15px;padding:10px 12px;border:1px solid #e8d8bd;background:#fff8ec;border-radius:8px;color:#8a633f;font-size:9px;line-height:1.6}
+@media(max-width:1050px){.sidebar{width:205px}.main{margin-left:205px;padding:0 3vw}.stats{grid-template-columns:repeat(2,1fr)}.content-grid{grid-template-columns:1fr}.material-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.sidebar{position:sticky;top:0;width:100%;height:auto;padding:10px 12px;display:block}.brand{padding:0 4px 10px}.brand-mark{width:31px;height:31px}.nav{display:flex;overflow-x:auto;gap:4px}.nav-label,.sidebar-bottom{display:none}.nav button{height:36px;padding:0 9px;white-space:nowrap;font-size:9px}.nav button span{font-size:13px}.main{margin:0;padding:0 14px}.topbar{height:75px}.topbar h1{font-size:19px}.top-actions{gap:5px}.date-chip{display:none}.demo-chip{font-size:8px;padding:8px}.btn-quiet{padding:9px;font-size:9px}.view{padding-top:17px}.hero{padding:22px;min-height:170px}.hero h2{font-size:26px}.hero-mark{width:76px;height:76px;font-size:7px}.hero-mark b{font-size:14px}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:24px}.panel{padding:14px}.quick-add{flex-direction:column}.quick-add .btn{align-self:flex-start}.section-intro{align-items:flex-start;gap:10px;flex-direction:column}.columns{grid-template-columns:1fr}.material-form{grid-template-columns:1fr 1fr;gap:10px}.history-columns{grid-template-columns:1fr;gap:12px}.history-head{align-items:flex-start;gap:8px;flex-direction:column}.footer{gap:8px;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark">P</span><span><span class="brand-name">PRINTLOG</span><span class="brand-sub">PRODUCTION DESK</span></span></div>
+  <div class="nav-label">WORKSPACE</div>
+  <nav class="nav">
+    <button class="active" data-view="dashboard"><span>▦</span> Overview</button>
+    <button data-view="tasks"><span>☷</span> Work & tasks <i id="pendingBadge">3</i></button>
+    <button data-view="materials"><span>▤</span> Paper & materials</button>
+    <button data-view="history"><span>◷</span> Daily history</button>
+  </nav>
+  <div class="sidebar-bottom"><span class="dot"></span><div><b>Concept workspace</b><small>Sample data · visual preview</small></div></div>
+</aside>
+<main class="main">
+<header class="topbar"><div><div class="eyebrow">PRINT SHOP / DAILY OPERATIONS</div><h1 id="pageTitle">Overview</h1></div><div class="top-actions"><span class="date-chip" id="dateLabel">SAT · 21 NOV 2026</span><span class="demo-chip">DEMO DATA</span></div></header>
+<div class="preview-note">Visual concept only. The sample jobs and quantities below are fictional; this preview does not read or change your live PRINTLOG records.</div>
+<section class="view active" id="view-dashboard">
+  <div class="hero"><div class="hero-copy"><div class="eyebrow">YOUR WORK, IN ONE PLACE</div><h2>Make every print day<br><em>count.</em></h2><p>A calmer way to follow every job, record each material and see what needs to happen next.</p></div><div class="hero-mark">DAILY<b>LOG</b><span>✳</span></div></div>
+  <div class="stats">
+    <article class="stat"><label>OPEN TASKS</label><strong id="statOpen">3</strong><small>Work still to finish</small></article>
+    <article class="stat"><label>FINISHED TODAY</label><strong id="statDone">4</strong><small>Tasks completed today</small></article>
+    <article class="stat"><label>WORKED ON TODAY</label><strong id="statNotes">3</strong><small>Daily work updates</small></article>
+    <article class="stat"><label>MATERIAL ENTRIES</label><strong id="statMaterials">18</strong><small>Paper records saved</small></article>
+  </div>
+  <div class="content-grid">
+    <section class="panel"><div class="panel-head"><div><div class="eyebrow">TODAY'S PRODUCTION</div><h3>Work log</h3></div><button class="link-btn" data-goto="tasks">Manage work ↗</button></div><form class="quick-add" id="quickNote"><input id="noteInput" placeholder="What did you work on today?" required><button class="btn btn-primary">Add note +</button></form><div class="list" id="noteList"><div class="note-row"><span class="note-icon">✳</span>Checked invitation artwork and spelling</div><div class="note-row"><span class="note-icon">✳</span>Printed 250 business cards</div><div class="note-row"><span class="note-icon">✳</span>Prepared flex banner file for output</div></div></section>
+    <section class="panel"><div class="panel-head"><div><div class="eyebrow">NEXT IN THE QUEUE</div><h3>Pending work</h3></div><span class="count" id="pendingCount">3 OPEN</span></div><div class="list" id="dashboardTasks"></div></section>
+  </div>
+  <section class="panel"><div class="panel-head"><div><div class="eyebrow">PAPER & MATERIALS</div><h3>Latest material entries</h3></div><button class="link-btn" data-goto="materials">Open register ↗</button></div><div class="material-table" id="recentTable"></div></section>
+</section>
+<section class="view" id="view-tasks">
+  <div class="section-intro"><div><div class="eyebrow">DAILY PRODUCTION</div><h2>Work & tasks</h2><p>Keep work updates separate from jobs that are actually finished.</p></div><span class="count">PENDING + COMPLETED</span></div>
+  <div class="columns">
+    <section class="panel"><div class="panel-head"><div><div class="eyebrow">IN PROGRESS</div><h3>Pending work</h3></div><span class="count" id="openCount">3 OPEN</span></div><form id="taskForm" class="form-stack"><label class="field">New job / task<input id="taskTitle" placeholder="e.g. Wedding invitation — 500 copies" required></label><label class="field">Details (optional)<input id="taskDetails" placeholder="Size, customer, finishing..."></label><button class="btn btn-primary">＋ Add task</button></form><div class="list" id="openTasks"></div></section>
+    <section class="panel"><div class="panel-head"><div><div class="eyebrow">COMPLETED</div><h3>Finished work</h3></div><span class="count" id="doneCount">4 DONE</span></div><div class="list" id="doneTasks"></div></section>
+  </div>
+  <section class="panel"><div class="panel-head"><div><div class="eyebrow">DAILY NOTES</div><h3>What I worked on</h3></div></div><div class="list" id="allNotes"></div></section>
+</section>
+<section class="view" id="view-materials">
+  <div class="section-intro"><div><div class="eyebrow">PAPER & CONSUMABLES</div><h2>Material register</h2><p>Record what paper went out, how much and which job it belongs to.</p></div><span class="count">PAPER / PRINTING RECORDS</span></div>
+  <section class="panel"><div class="panel-head"><div><div class="eyebrow">NEW ENTRY</div><h3>Add printing material</h3></div></div><form id="materialForm" class="material-form">
+    <label class="field">Paper / GSM<select id="paper"><option>300 GSM</option><option>250 GSM</option><option>200 GSM</option><option>170 GSM</option><option>150 GSM</option><option>130 GSM</option><option>120 GSM</option><option>100 GSM</option><option>80 GSM</option><option>Other</option></select></label>
+    <label class="field">Custom name<input id="customPaper" placeholder="If other..." disabled></label>
+    <label class="field">Quantity<input id="quantity" type="number" min="0.01" step="any" placeholder="e.g. 500" required></label>
+    <label class="field">Unit<select id="unit"><option>Sheets</option><option>Packets</option><option>Kg</option><option>Rolls</option><option>Bundles</option></select></label>
+    <label class="field">Paper size<input id="size" placeholder="A4, 12 × 18, 20 × 30"></label>
+    <label class="field">Supplier / printer<input id="supplier" placeholder="Name (optional)"></label>
+    <label class="field wide">Purpose / job<input id="purpose" placeholder="Which job was this material for?"></label>
+    <button class="btn btn-primary">Save material entry ↗</button>
+  </form></section>
+  <section class="panel"><div class="panel-head"><div><div class="eyebrow">REGISTER</div><h3>Material history</h3></div><span class="count" id="materialCount">4 ENTRIES SHOWN</span></div><div class="material-table" id="allMaterials"></div></section>
+</section>
+<section class="view" id="view-history">
+  <div class="section-intro"><div><div class="eyebrow">YOUR RECORDS</div><h2>Daily history</h2><p>See what started, what finished and what materials were recorded each day.</p></div><input class="search" id="historySearch" placeholder="Search a job, GSM or date..."></div>
+  <div class="history-list" id="historyList"></div>
+</section>
+<footer class="footer"><span>PRINTLOG <b>·</b> PRINTING WORK TRACKER</span><span>Designed for the everyday print floor.</span></footer>
+</main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(function(){
+const today='2026-11-21';
+let tasks=[
+{id:1,title:'Wedding invitation — 500 copies',details:'5 × 7 in · matte finish',done:false,carried:true,created:'2026-11-20'},
+{id:2,title:'Flex banner — 6 × 3 ft',details:'Customer approval received',done:false,carried:false,created:'2026-11-21'},
+{id:3,title:'Lamination — certificate set',details:'12 sheets · gloss',done:false,carried:false,created:'2026-11-21'},
+{id:4,title:'Business cards — 250 copies',details:'9.2 × 5.4 cm',done:true,created:'2026-11-21'},
+{id:5,title:'Doctor clinic letterhead',details:'A4 · 100 GSM',done:true,created:'2026-11-20'},
+{id:6,title:'Shop opening stickers',details:'2 cm round',done:true,created:'2026-11-21'},
+{id:7,title:'Invoice book layout',details:'Artwork approved',done:true,created:'2026-11-21'}
+];
+let notes=['Checked invitation artwork and spelling','Printed 250 business cards','Prepared flex banner file for output'];
+let materials=[
+{date:'21 Nov',paper:'300 GSM',qty:'500 Sheets',size:'12 × 18 in',supplier:'City Paper House',purpose:'Wedding invitations'},
+{date:'21 Nov',paper:'170 GSM',qty:'250 Sheets',size:'A4',supplier:'In-house',purpose:'Business cards'},
+{date:'20 Nov',paper:'130 GSM',qty:'100 Sheets',size:'A3',supplier:'Metro Traders',purpose:'Flyers'},
+{date:'20 Nov',paper:'100 GSM',qty:'2 Packets',size:'A4',supplier:'In-house',purpose:'Letterheads'}
+];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1900)}
+function taskHTML(t){return '<div class="task-row '+(t.done?'done':'')+'"><button class="check" data-toggle="'+t.id+'" aria-label="Toggle completed">'+(t.done?'✓':'')+'</button><div class="task-copy"><b>'+esc(t.title)+'</b><small>'+esc(t.details||'Added '+t.created)+'</small></div>'+(t.carried&&!t.done?'<span class="tag">CARRIED</span>':'')+'</div>'}
+function tableHTML(rows){return '<table><thead><tr><th>DATE</th><th>PAPER</th><th>QUANTITY</th><th>SIZE</th><th>SUPPLIER / PRINTER</th><th>PURPOSE</th></tr></thead><tbody>'+rows.map(m=>'<tr><td>'+esc(m.date)+'</td><td><span class="gsm">'+esc(m.paper)+'</span></td><td><b>'+esc(m.qty)+'</b></td><td>'+esc(m.size)+'</td><td>'+esc(m.supplier)+'</td><td>'+esc(m.purpose)+'</td></tr>').join('')+'</tbody></table>'}
+function render(){
+const open=tasks.filter(t=>!t.done),done=tasks.filter(t=>t.done);
+$('statOpen').textContent=open.length;$('statDone').textContent=done.length;$('statNotes').textContent=notes.length;$('statMaterials').textContent=materials.length;
+$('pendingBadge').textContent=open.length;$('pendingCount').textContent=open.length+' OPEN';$('openCount').textContent=open.length+' OPEN';$('doneCount').textContent=done.length+' DONE';$('materialCount').textContent=materials.length+' ENTRIES';
+$('dashboardTasks').innerHTML=open.slice(0,4).map(taskHTML).join('')||'<div class="empty">All caught up. No pending jobs.</div>';
+$('openTasks').innerHTML=open.map(taskHTML).join('')||'<div class="empty">No pending work. Add a new job above.</div>';
+$('doneTasks').innerHTML=done.map(taskHTML).join('')||'<div class="empty">Finished jobs will appear here.</div>';
+$('noteList').innerHTML=notes.map(n=>'<div class="note-row"><span class="note-icon">✳</span>'+esc(n)+'</div>').join('')||'<div class="empty">No work notes yet.</div>';
+$('allNotes').innerHTML=$('noteList').innerHTML;
+$('recentTable').innerHTML=tableHTML(materials.slice(0,3));$('allMaterials').innerHTML=tableHTML(materials);
+$('historyList').innerHTML=historyHTML($('historySearch').value);
+}
+function historyHTML(query){const q=(query||'').toLowerCase();const groups=[{date:'Saturday, 21 November 2026',items:['Checked invitation artwork and spelling','Printed 250 business cards','Prepared flex banner file for output'],finished:['Business cards — 250 copies','Shop opening stickers','Invoice book layout'],started:['Flex banner — 6 × 3 ft','Lamination — certificate set'],paper:['300 GSM · 500 Sheets · Wedding invitations','170 GSM · 250 Sheets · Business cards']},{date:'Friday, 20 November 2026',items:['Prepared wedding invitation layout'],finished:['Doctor clinic letterhead'],started:['Wedding invitation — 500 copies'],paper:['130 GSM · 100 Sheets · Flyers','100 GSM · 2 Packets · Letterheads']}];return groups.map(g=>{const all=[...g.items,...g.finished,...g.started,...g.paper].join(' ').toLowerCase();if(q&&!all.includes(q)&&!g.date.toLowerCase().includes(q))return '';return '<article class="history-day"><div class="history-head"><b>'+g.date+'</b><small>'+g.finished.length+' FINISHED · '+g.started.length+' OPEN · '+g.paper.length+' MATERIALS</small></div><div class="history-columns"><div><h4>WORKED ON / UPDATES</h4>'+g.items.map(x=>'<p>↳ '+esc(x)+'</p>').join('')+'<h4 style="margin-top:13px">TASKS FINISHED</h4>'+g.finished.map(x=>'<p>✓ '+esc(x)+'</p>').join('')+'</div><div><h4>OPEN TASKS / STARTED</h4>'+g.started.map(x=>'<p>○ '+esc(x)+'</p>').join('')+'<h4 style="margin-top:13px">MATERIALS</h4>'+g.paper.map(x=>'<p>▤ '+esc(x)+'</p>').join('')+'</div></div></article>'}).join('')||'<div class="empty">No matching history in this sample.</div>'}
+function show(name){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));$('pageTitle').textContent=({dashboard:'Overview',tasks:'Work & tasks',materials:'Paper & materials',history:'Daily history'})[name]}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.goto)));
+document.addEventListener('click',e=>{const b=e.target.closest('[data-toggle]');if(!b)return;const t=tasks.find(x=>x.id===Number(b.dataset.toggle));if(t){t.done=!t.done;t.carried=false;render();toast(t.done?'Marked as finished':'Moved back to pending')}});
+$('quickNote').addEventListener('submit',e=>{e.preventDefault();const v=$('noteInput').value.trim();if(!v)return;notes.unshift(v);$('noteInput').value='';render();toast('Work update added to this preview')});
+$('taskForm').addEventListener('submit',e=>{e.preventDefault();const title=$('taskTitle').value.trim();if(!title)return;tasks.unshift({id:Date.now(),title,details:$('taskDetails').value.trim(),done:false,created:today});e.target.reset();render();toast('Sample task added')});
+$('paper').addEventListener('change',e=>{$('customPaper').disabled=e.target.value!=='Other';if(e.target.value!=='Other')$('customPaper').value=''});
+$('materialForm').addEventListener('submit',e=>{e.preventDefault();const paper=$('paper').value==='Other'?$('customPaper').value.trim():$('paper').value;if(!paper){toast('Enter a paper name');return}materials.unshift({date:'21 Nov',paper,qty:$('quantity').value+' '+$('unit').value,size:$('size').value||'—',supplier:$('supplier').value||'—',purpose:$('purpose').value||'—'});e.target.reset();$('customPaper').disabled=true;render();toast('Sample material entry added')});
+$('historySearch').addEventListener('input',()=>{$('historyList').innerHTML=historyHTML($('historySearch').value)});
+render();
+})();
+</script>
+</body>
+</html>
