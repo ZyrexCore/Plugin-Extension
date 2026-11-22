@@ -30,7 +30,7 @@
   <div class="sidebar-bottom"><span class="dot"></span><div><b>Concept workspace</b><small>Sample data · visual preview</small></div></div>
 </aside>
 <main class="main">
-<header class="topbar"><div><div class="eyebrow">PRINT SHOP / DAILY OPERATIONS</div><h1 id="pageTitle">Overview</h1></div><div class="top-actions"><span class="date-chip" id="dateLabel">SAT · 21 NOV 2026</span><span class="demo-chip">DEMO DATA</span></div></header>
+<header class="topbar"><div><div class="eyebrow">PRINT SHOP / DAILY OPERATIONS</div><h1 id="pageTitle">Overview</h1></div><div class="top-actions"><span class="date-chip" id="dateLabel">TODAY</span><span class="demo-chip">DEMO DATA</span></div></header>
 <div class="preview-note">Visual concept only. The sample jobs and quantities below are fictional; this preview does not read or change your live PRINTLOG records.</div>
 <section class="view active" id="view-dashboard">
   <div class="hero"><div class="hero-copy"><div class="eyebrow">YOUR WORK, IN ONE PLACE</div><h2>Make every print day<br><em>count.</em></h2><p>A calmer way to follow every job, record each material and see what needs to happen next.</p></div><div class="hero-mark">DAILY<b>LOG</b><span>✳</span></div></div>
@@ -78,22 +78,29 @@
 <div class="toast" id="toast" role="status"></div>
 <script>
 (function(){
-const today='2026-11-21';
+const now=new Date();
+const previous=new Date(now);previous.setDate(previous.getDate()-1);
+const dateKey=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+const today=dateKey(now),previousKey=dateKey(previous);
+const todayLong=now.toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+const previousLong=previous.toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+const todayShort=now.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+const previousShort=previous.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
 let tasks=[
-{id:1,title:'Wedding invitation — 500 copies',details:'5 × 7 in · matte finish',done:false,carried:true,created:'2026-11-20'},
-{id:2,title:'Flex banner — 6 × 3 ft',details:'Customer approval received',done:false,carried:false,created:'2026-11-21'},
-{id:3,title:'Lamination — certificate set',details:'12 sheets · gloss',done:false,carried:false,created:'2026-11-21'},
-{id:4,title:'Business cards — 250 copies',details:'9.2 × 5.4 cm',done:true,created:'2026-11-21'},
-{id:5,title:'Doctor clinic letterhead',details:'A4 · 100 GSM',done:true,created:'2026-11-20'},
-{id:6,title:'Shop opening stickers',details:'2 cm round',done:true,created:'2026-11-21'},
-{id:7,title:'Invoice book layout',details:'Artwork approved',done:true,created:'2026-11-21'}
+{id:1,title:'Wedding invitation — 500 copies',details:'5 × 7 in · matte finish',done:false,carried:true,created:previousKey},
+{id:2,title:'Flex banner — 6 × 3 ft',details:'Customer approval received',done:false,carried:false,created:today},
+{id:3,title:'Lamination — certificate set',details:'12 sheets · gloss',done:false,carried:false,created:today},
+{id:4,title:'Business cards — 250 copies',details:'9.2 × 5.4 cm',done:true,created:today},
+{id:5,title:'Doctor clinic letterhead',details:'A4 · 100 GSM',done:true,created:previousKey},
+{id:6,title:'Shop opening stickers',details:'2 cm round',done:true,created:today},
+{id:7,title:'Invoice book layout',details:'Artwork approved',done:true,created:today}
 ];
 let notes=['Checked invitation artwork and spelling','Printed 250 business cards','Prepared flex banner file for output'];
 let materials=[
-{date:'21 Nov',paper:'300 GSM',qty:'500 Sheets',size:'12 × 18 in',supplier:'City Paper House',purpose:'Wedding invitations'},
-{date:'21 Nov',paper:'170 GSM',qty:'250 Sheets',size:'A4',supplier:'In-house',purpose:'Business cards'},
-{date:'20 Nov',paper:'130 GSM',qty:'100 Sheets',size:'A3',supplier:'Metro Traders',purpose:'Flyers'},
-{date:'20 Nov',paper:'100 GSM',qty:'2 Packets',size:'A4',supplier:'In-house',purpose:'Letterheads'}
+{date:todayShort,paper:'300 GSM',qty:'500 Sheets',size:'12 × 18 in',supplier:'City Paper House',purpose:'Wedding invitations'},
+{date:todayShort,paper:'170 GSM',qty:'250 Sheets',size:'A4',supplier:'In-house',purpose:'Business cards'},
+{date:previousShort,paper:'130 GSM',qty:'100 Sheets',size:'A3',supplier:'Metro Traders',purpose:'Flyers'},
+{date:previousShort,paper:'100 GSM',qty:'2 Packets',size:'A4',supplier:'In-house',purpose:'Letterheads'}
 ];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -101,6 +108,7 @@ function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setT
 function taskHTML(t){return '<div class="task-row '+(t.done?'done':'')+'"><button class="check" data-toggle="'+t.id+'" aria-label="Toggle completed">'+(t.done?'✓':'')+'</button><div class="task-copy"><b>'+esc(t.title)+'</b><small>'+esc(t.details||'Added '+t.created)+'</small></div>'+(t.carried&&!t.done?'<span class="tag">CARRIED</span>':'')+'</div>'}
 function tableHTML(rows){return '<table><thead><tr><th>DATE</th><th>PAPER</th><th>QUANTITY</th><th>SIZE</th><th>SUPPLIER / PRINTER</th><th>PURPOSE</th></tr></thead><tbody>'+rows.map(m=>'<tr><td>'+esc(m.date)+'</td><td><span class="gsm">'+esc(m.paper)+'</span></td><td><b>'+esc(m.qty)+'</b></td><td>'+esc(m.size)+'</td><td>'+esc(m.supplier)+'</td><td>'+esc(m.purpose)+'</td></tr>').join('')+'</tbody></table>'}
 function render(){
+$('dateLabel').textContent=now.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}).toUpperCase().replace(/,/g,' ·');
 const open=tasks.filter(t=>!t.done),done=tasks.filter(t=>t.done);
 $('statOpen').textContent=open.length;$('statDone').textContent=done.length;$('statNotes').textContent=notes.length;$('statMaterials').textContent=materials.length;
 $('pendingBadge').textContent=open.length;$('pendingCount').textContent=open.length+' OPEN';$('openCount').textContent=open.length+' OPEN';$('doneCount').textContent=done.length+' DONE';$('materialCount').textContent=materials.length+' ENTRIES';
@@ -112,7 +120,7 @@ $('allNotes').innerHTML=$('noteList').innerHTML;
 $('recentTable').innerHTML=tableHTML(materials.slice(0,3));$('allMaterials').innerHTML=tableHTML(materials);
 $('historyList').innerHTML=historyHTML($('historySearch').value);
 }
-function historyHTML(query){const q=(query||'').toLowerCase();const groups=[{date:'Saturday, 21 November 2026',items:['Checked invitation artwork and spelling','Printed 250 business cards','Prepared flex banner file for output'],finished:['Business cards — 250 copies','Shop opening stickers','Invoice book layout'],started:['Flex banner — 6 × 3 ft','Lamination — certificate set'],paper:['300 GSM · 500 Sheets · Wedding invitations','170 GSM · 250 Sheets · Business cards']},{date:'Friday, 20 November 2026',items:['Prepared wedding invitation layout'],finished:['Doctor clinic letterhead'],started:['Wedding invitation — 500 copies'],paper:['130 GSM · 100 Sheets · Flyers','100 GSM · 2 Packets · Letterheads']}];return groups.map(g=>{const all=[...g.items,...g.finished,...g.started,...g.paper].join(' ').toLowerCase();if(q&&!all.includes(q)&&!g.date.toLowerCase().includes(q))return '';return '<article class="history-day"><div class="history-head"><b>'+g.date+'</b><small>'+g.finished.length+' FINISHED · '+g.started.length+' OPEN · '+g.paper.length+' MATERIALS</small></div><div class="history-columns"><div><h4>WORKED ON / UPDATES</h4>'+g.items.map(x=>'<p>↳ '+esc(x)+'</p>').join('')+'<h4 style="margin-top:13px">TASKS FINISHED</h4>'+g.finished.map(x=>'<p>✓ '+esc(x)+'</p>').join('')+'</div><div><h4>OPEN TASKS / STARTED</h4>'+g.started.map(x=>'<p>○ '+esc(x)+'</p>').join('')+'<h4 style="margin-top:13px">MATERIALS</h4>'+g.paper.map(x=>'<p>▤ '+esc(x)+'</p>').join('')+'</div></div></article>'}).join('')||'<div class="empty">No matching history in this sample.</div>'}
+function historyHTML(query){const q=(query||'').toLowerCase();const groups=[{date:todayLong,items:['Checked invitation artwork and spelling','Printed 250 business cards','Prepared flex banner file for output'],finished:['Business cards — 250 copies','Shop opening stickers','Invoice book layout'],started:['Flex banner — 6 × 3 ft','Lamination — certificate set'],paper:['300 GSM · 500 Sheets · Wedding invitations','170 GSM · 250 Sheets · Business cards']},{date:previousLong,items:['Prepared wedding invitation layout'],finished:['Doctor clinic letterhead'],started:['Wedding invitation — 500 copies'],paper:['130 GSM · 100 Sheets · Flyers','100 GSM · 2 Packets · Letterheads']}];return groups.map(g=>{const all=[...g.items,...g.finished,...g.started,...g.paper].join(' ').toLowerCase();if(q&&!all.includes(q)&&!g.date.toLowerCase().includes(q))return '';return '<article class="history-day"><div class="history-head"><b>'+g.date+'</b><small>'+g.finished.length+' FINISHED · '+g.started.length+' OPEN · '+g.paper.length+' MATERIALS</small></div><div class="history-columns"><div><h4>WORKED ON / UPDATES</h4>'+g.items.map(x=>'<p>↳ '+esc(x)+'</p>').join('')+'<h4 style="margin-top:13px">TASKS FINISHED</h4>'+g.finished.map(x=>'<p>✓ '+esc(x)+'</p>').join('')+'</div><div><h4>OPEN TASKS / STARTED</h4>'+g.started.map(x=>'<p>○ '+esc(x)+'</p>').join('')+'<h4 style="margin-top:13px">MATERIALS</h4>'+g.paper.map(x=>'<p>▤ '+esc(x)+'</p>').join('')+'</div></div></article>'}).join('')||'<div class="empty">No matching history in this sample.</div>'}
 function show(name){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));$('pageTitle').textContent=({dashboard:'Overview',tasks:'Work & tasks',materials:'Paper & materials',history:'Daily history'})[name]}
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.goto)));
@@ -120,7 +128,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-toggle]');
 $('quickNote').addEventListener('submit',e=>{e.preventDefault();const v=$('noteInput').value.trim();if(!v)return;notes.unshift(v);$('noteInput').value='';render();toast('Work update added to this preview')});
 $('taskForm').addEventListener('submit',e=>{e.preventDefault();const title=$('taskTitle').value.trim();if(!title)return;tasks.unshift({id:Date.now(),title,details:$('taskDetails').value.trim(),done:false,created:today});e.target.reset();render();toast('Sample task added')});
 $('paper').addEventListener('change',e=>{$('customPaper').disabled=e.target.value!=='Other';if(e.target.value!=='Other')$('customPaper').value=''});
-$('materialForm').addEventListener('submit',e=>{e.preventDefault();const paper=$('paper').value==='Other'?$('customPaper').value.trim():$('paper').value;if(!paper){toast('Enter a paper name');return}materials.unshift({date:'21 Nov',paper,qty:$('quantity').value+' '+$('unit').value,size:$('size').value||'—',supplier:$('supplier').value||'—',purpose:$('purpose').value||'—'});e.target.reset();$('customPaper').disabled=true;render();toast('Sample material entry added')});
+$('materialForm').addEventListener('submit',e=>{e.preventDefault();const paper=$('paper').value==='Other'?$('customPaper').value.trim():$('paper').value;if(!paper){toast('Enter a paper name');return}materials.unshift({date:todayShort,paper,qty:$('quantity').value+' '+$('unit').value,size:$('size').value||'—',supplier:$('supplier').value||'—',purpose:$('purpose').value||'—'});e.target.reset();$('customPaper').disabled=true;render();toast('Sample material entry added')});
 $('historySearch').addEventListener('input',()=>{$('historyList').innerHTML=historyHTML($('historySearch').value)});
 render();
 })();
