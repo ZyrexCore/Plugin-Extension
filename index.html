@@ -16,6 +16,7 @@
     <button class="nav-item" data-view="completed"><span class="nav-icon">✓</span>Finished work</button>
     <button class="nav-item" data-view="history"><span class="nav-icon">◷</span>History</button>
     <button class="nav-item" data-view="setup"><span class="nav-icon">⚙</span>Setup & lists</button>
+    <button class="nav-item" data-view="settings"><span class="nav-icon">☷</span>Preferences</button>
   </nav>
   <div class="sidebar-foot"><span class="online-dot"></span><div><b>Saved on this device</b><small>Browser storage is active</small></div></div>
 </aside>
@@ -35,12 +36,15 @@
     <article class="metric"><div class="metric-label">IN PROGRESS <span class="metric-symbol blue">↗</span></div><b id="metricProgress">0</b><small>Currently being worked on</small></article>
     <article class="metric"><div class="metric-label">FINISHED TODAY <span class="metric-symbol green">✓</span></div><b id="metricFinished">0</b><small>Completed today</small></article>
   </div>
-  <div class="section-heading"><div><div class="kicker">PRODUCTION QUEUE</div><h2>Jobs that need attention</h2></div><button class="link-button" data-goto="jobs">View all jobs ↗</button></div>
-  <div class="queue-grid">
-    <section class="surface"><div class="surface-head"><div><span class="status-dot waiting"></span><h3>Not started</h3><small>Accepted, waiting for production</small></div><span class="number-pill" id="waitingPill">0</span></div><div id="dashboardWaiting" class="job-list"></div></section>
-    <section class="surface"><div class="surface-head"><div><span class="status-dot progress"></span><h3>In progress</h3><small>Currently on the production floor</small></div><span class="number-pill" id="progressPill">0</span></div><div id="dashboardProgress" class="job-list"></div></section>
-  </div>
-  <section class="surface finished-strip"><div class="surface-head"><div><div class="kicker">COMPLETED TODAY</div><h3>Finished work</h3></div><button class="link-button" data-goto="completed">See finished jobs ↗</button></div><div id="dashboardFinished" class="finished-list"></div></section>
+  <div class="section-heading"><div><div class="kicker">WORK STATUS</div><h2>Production queue</h2></div><button class="link-button" data-goto="jobs">Open job register ↗</button></div>
+  <section class="surface dashboard-queue">
+    <div class="status-tabs" role="tablist" aria-label="Filter work by status">
+      <button class="status-tab active" type="button" role="tab" aria-selected="true" data-dashboard-status="not_started"><span class="status-dot waiting"></span>Pending <b id="waitingPill">0</b></button>
+      <button class="status-tab" type="button" role="tab" aria-selected="false" data-dashboard-status="in_progress"><span class="status-dot progress"></span>In progress <b id="progressPill">0</b></button>
+      <button class="status-tab" type="button" role="tab" aria-selected="false" data-dashboard-status="finished"><span class="status-dot finished"></span>Finished <b id="finishedPill">0</b></button>
+    </div>
+    <div id="dashboardStatusList" class="job-list job-list-large" role="tabpanel" aria-live="polite"></div>
+  </section>
 </section>
 <section class="view" id="view-jobs">
   <div class="page-intro"><div><div class="kicker">JOB REGISTER</div><h2>All jobs</h2><p>Every job you accept, from the moment it comes in until it is finished.</p></div><button class="button button-primary" id="jobsAddBtn">＋ Add new job</button></div>
@@ -64,6 +68,27 @@
     <section class="surface setup-card"><div class="setup-icon">▧</div><h3>Materials</h3><p>Paper and other materials used for printing jobs.</p><form class="catalog-form" data-catalog="materials"><input name="item" placeholder="e.g. 300 GSM" required><button class="button button-primary">Add</button></form><div id="materialsList" class="catalog-list"></div></section>
   </div>
   <div class="storage-note"><span>ⓘ</span><div><b>Your data stays in this browser</b><p>Jobs and custom lists are saved locally on this device. Export a backup regularly. Clearing browser data or switching devices will not carry records over automatically.</p></div></div>
+</section>
+<section class="view" id="view-settings">
+  <div class="page-intro"><div><div class="kicker">MAKE PRINTLOG YOURS</div><h2>Preferences & accessibility</h2><p>Personalize how Printlog looks and feels. These settings are saved in this browser.</p></div></div>
+  <div class="preferences-grid">
+    <section class="surface preference-card"><div class="preference-heading"><span class="preference-icon">◐</span><div><h3>Appearance</h3><p>Choose the interface theme.</p></div></div>
+      <label class="setting-field">Theme<select id="settingTheme"><option value="system">System default</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+      <label class="setting-field">Accent color<select id="settingAccent"><option value="blue">Classic blue</option><option value="violet">Violet</option><option value="teal">Teal</option><option value="green">Forest green</option><option value="orange">Warm orange</option><option value="rose">Rose</option></select></label>
+      <label class="setting-field">Font<select id="settingFont"><option value="default">System default</option><option value="dm">DM Sans</option><option value="inter">Inter</option><option value="readable">Atkinson Hyperlegible</option><option value="arial">Arial</option></select></label>
+    </section>
+    <section class="surface preference-card"><div class="preference-heading"><span class="preference-icon">Aa</span><div><h3>Readability</h3><p>Adjust text and contrast to suit you.</p></div></div>
+      <label class="setting-field">Text size <select id="settingTextSize"><option value="normal">Default</option><option value="large">Large</option><option value="larger">Extra large</option></select></label>
+      <label class="setting-toggle"><span><b>High contrast</b><small>Increase contrast between text, surfaces and borders.</small></span><input type="checkbox" id="settingContrast"></label>
+      <label class="setting-toggle"><span><b>Underline links</b><small>Make links easier to identify.</small></span><input type="checkbox" id="settingUnderline"></label>
+    </section>
+    <section class="surface preference-card"><div class="preference-heading"><span class="preference-icon">⌁</span><div><h3>Interaction</h3><p>Make controls and movement more comfortable.</p></div></div>
+      <label class="setting-toggle"><span><b>Reduce motion</b><small>Turn off most transitions and animated effects.</small></span><input type="checkbox" id="settingMotion"></label>
+      <label class="setting-toggle"><span><b>Larger click targets</b><small>Increase the size and spacing of buttons and controls.</small></span><input type="checkbox" id="settingTargets"></label>
+      <label class="setting-toggle"><span><b>Always show focus outline</b><small>Keep a clear outline around keyboard-focused controls.</small></span><input type="checkbox" id="settingFocus"></label>
+    </section>
+    <div class="preferences-actions"><button class="button button-ghost" id="resetPreferences" type="button">Reset preferences</button><span id="preferencesSaved" role="status">Changes save automatically on this device.</span></div>
+  </div>
 </section>
 <footer><span>PRINTLOG <b>·</b> PRODUCTION DESK</span><span>Simple records. Clear production.</span></footer>
 </main>
