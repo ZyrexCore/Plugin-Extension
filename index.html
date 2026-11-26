@@ -2,74 +2,74 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#11140f"><meta name="description" content="A simple daily production and paper-material tracker for printing work.">
-<title>Printlog — Printing Work Tracker</title><link rel="stylesheet" href="styles.css">
+<meta name="theme-color" content="#101311"><meta name="description" content="Printlog — printing shop job management.">
+<title>Printlog — Production Desk</title><link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="shell">
+<div class="app-shell">
 <aside class="sidebar">
-  <a class="brand" href="#"><span class="brand-mark">P</span><span><b>PRINTLOG</b><small>PRODUCTION DESK</small></span></a>
-  <div class="side-label">WORKSPACE</div>
-  <nav>
-    <button class="nav-link active" data-view="dashboard"><span>▦</span> Overview</button>
-    <button class="nav-link" data-view="tasks"><span>☷</span> Work & tasks <i id="pendingBadge">0</i></button>
-    <button class="nav-link" data-view="materials"><span>▤</span> Paper & materials</button>
-    <button class="nav-link" data-view="history"><span>◷</span> Daily history</button>
+  <a class="brand" href="#"><span class="brand-icon">P</span><span><b>PRINTLOG</b><small>PRODUCTION DESK</small></span></a>
+  <div class="nav-caption">WORKSPACE</div>
+  <nav class="main-nav">
+    <button class="nav-item active" data-view="dashboard"><span class="nav-icon">▦</span>Overview</button>
+    <button class="nav-item" data-view="jobs"><span class="nav-icon">▤</span>All jobs <i id="navOpenCount">0</i></button>
+    <button class="nav-item" data-view="completed"><span class="nav-icon">✓</span>Finished work</button>
+    <button class="nav-item" data-view="history"><span class="nav-icon">◷</span>History</button>
+    <button class="nav-item" data-view="setup"><span class="nav-icon">⚙</span>Setup & lists</button>
   </nav>
-  <div class="sidebar-bottom"><div class="local-dot"></div><div><b>Saved on this device</b><small>Your records stay in this browser</small></div></div>
+  <div class="sidebar-foot"><span class="online-dot"></span><div><b>Saved on this device</b><small>Browser storage is active</small></div></div>
 </aside>
-<main class="main">
-<header class="topbar"><div><div class="eyebrow">PRINT SHOP / DAILY OPERATIONS</div><h1 id="pageTitle">Overview</h1></div><div class="top-actions"><span class="today-chip" id="todayLabel"></span><button class="btn btn-quiet" id="exportBtn">↓ Export backup</button></div></header>
+<main class="main-area">
+<header class="topbar">
+  <div><div class="kicker">PRINT SHOP / OPERATIONS</div><h1 id="pageTitle">Overview</h1></div>
+  <div class="topbar-actions"><span class="date-pill" id="todayDate"></span><button class="button button-ghost" id="exportBtn">↓ <span>Export backup</span></button><button class="button button-primary" id="quickAddBtn">＋ New job</button></div>
+</header>
 <section class="view active" id="view-dashboard">
-  <div class="welcome"><div><div class="eyebrow light">YOUR WORK, IN ONE PLACE</div><h2>Make every print day<br><em>count.</em></h2><p>Keep track of jobs, finished work and every sheet of paper that goes out for printing.</p></div><div class="welcome-stamp">DAILY<br><b>LOG</b><span>✳</span></div></div>
-  <div class="stats-grid">
-    <article class="stat-card"><span>OPEN TASKS</span><b id="statPending">0</b><small>Work still to finish</small></article>
-    <article class="stat-card"><span>FINISHED TODAY</span><b id="statFinished">0</b><small>Tasks completed today</small></article>
-    <article class="stat-card"><span>WORKED ON TODAY</span><b id="statWorked">0</b><small>Daily work notes</small></article>
-    <article class="stat-card"><span>MATERIAL ENTRIES</span><b id="statMaterials">0</b><small>Paper records saved</small></article>
+  <div class="hero">
+    <div><div class="kicker hero-kicker">YOUR DAILY PRODUCTION DESK</div><h2>Keep the work<br><em>moving forward.</em></h2><p>Know what came in, what is on the machines, and what has gone out finished.</p></div>
+    <div class="hero-mark"><span>PL</span><small>PRINTLOG<br>DAILY OPERATIONS</small></div>
   </div>
-  <div class="two-col">
-    <section class="panel"><div class="panel-head"><div><div class="eyebrow">TODAY'S PRODUCTION</div><h3>Work log</h3></div><button class="text-btn" data-goto="tasks">Manage work ↗</button></div>
-      <div class="quick-add"><input id="workInput" placeholder="What did you work on today?"><button class="btn btn-primary" id="addWorkBtn">Add note +</button></div>
-      <div id="todayWorkList" class="simple-list"></div>
-    </section>
-    <section class="panel"><div class="panel-head"><div><div class="eyebrow">NEXT UP</div><h3>Pending work</h3></div><span class="count-pill" id="pendingCount">0 OPEN</span></div><div id="dashboardPending" class="task-list compact"></div></section>
+  <div class="metric-grid">
+    <article class="metric"><div class="metric-label">JOBS TAKEN TODAY <span class="metric-symbol">＋</span></div><b id="metricTaken">0</b><small>New work received today</small></article>
+    <article class="metric"><div class="metric-label">NOT STARTED <span class="metric-symbol muted">Ⅱ</span></div><b id="metricWaiting">0</b><small>Waiting to begin</small></article>
+    <article class="metric"><div class="metric-label">IN PROGRESS <span class="metric-symbol blue">↗</span></div><b id="metricProgress">0</b><small>Currently being worked on</small></article>
+    <article class="metric"><div class="metric-label">FINISHED TODAY <span class="metric-symbol green">✓</span></div><b id="metricFinished">0</b><small>Completed today</small></article>
   </div>
-  <section class="panel"><div class="panel-head"><div><div class="eyebrow">PAPER STOCK ACTIVITY</div><h3>Latest material entries</h3></div><button class="text-btn" data-goto="materials">All materials ↗</button></div><div id="recentMaterials" class="table-wrap"></div></section>
+  <div class="section-heading"><div><div class="kicker">PRODUCTION QUEUE</div><h2>Jobs that need attention</h2></div><button class="link-button" data-goto="jobs">View all jobs ↗</button></div>
+  <div class="queue-grid">
+    <section class="surface"><div class="surface-head"><div><span class="status-dot waiting"></span><h3>Not started</h3><small>Accepted, waiting for production</small></div><span class="number-pill" id="waitingPill">0</span></div><div id="dashboardWaiting" class="job-list"></div></section>
+    <section class="surface"><div class="surface-head"><div><span class="status-dot progress"></span><h3>In progress</h3><small>Currently on the production floor</small></div><span class="number-pill" id="progressPill">0</span></div><div id="dashboardProgress" class="job-list"></div></section>
+  </div>
+  <section class="surface finished-strip"><div class="surface-head"><div><div class="kicker">COMPLETED TODAY</div><h3>Finished work</h3></div><button class="link-button" data-goto="completed">See finished jobs ↗</button></div><div id="dashboardFinished" class="finished-list"></div></section>
 </section>
-<section class="view" id="view-tasks">
-  <div class="section-intro"><div><div class="eyebrow">DAILY PRODUCTION</div><h2>Work & tasks</h2><p>Add jobs as you start them. Mark them finished when done.</p></div><span class="date-chip" id="taskDateLabel"></span></div>
-  <div class="two-col task-columns">
-    <section class="panel"><div class="panel-head"><div><div class="eyebrow">IN PROGRESS</div><h3>Worked on / pending</h3></div><span class="count-pill" id="openCount">0 OPEN</span></div>
-      <form id="taskForm" class="stack-form"><label>New job / task<input id="taskInput" required placeholder="e.g. Wedding invitation — 500 copies"></label><label>Notes (optional)<input id="taskNote" placeholder="Size, customer, details..."></label><button class="btn btn-primary" type="submit">＋ Add task</button></form>
-      <div id="openTasks" class="task-list"></div>
-    </section>
-    <section class="panel"><div class="panel-head"><div><div class="eyebrow">COMPLETED</div><h3>Finished work</h3></div><span class="count-pill success" id="doneCount">0 DONE</span></div><div id="doneTasks" class="task-list"></div></section>
-  </div>
-  <section class="panel"><div class="panel-head"><div><div class="eyebrow">DAILY NOTES</div><h3>What I worked on</h3></div></div><form id="noteForm" class="quick-add"><input id="dailyNoteInput" placeholder="Add a work update for today..."><button class="btn btn-primary">Add update +</button></form><div id="dailyNotes" class="simple-list"></div></section>
+<section class="view" id="view-jobs">
+  <div class="page-intro"><div><div class="kicker">JOB REGISTER</div><h2>All jobs</h2><p>Every job you accept, from the moment it comes in until it is finished.</p></div><button class="button button-primary" id="jobsAddBtn">＋ Add new job</button></div>
+  <div class="filter-bar"><div class="filter-tabs" id="jobFilters"><button class="filter-tab active" data-filter="all">All open</button><button class="filter-tab" data-filter="not_started">Not started</button><button class="filter-tab" data-filter="in_progress">In progress</button></div><input id="jobSearch" class="search-field" placeholder="Search jobs..."></div>
+  <div id="allJobsList" class="job-list job-list-large"></div>
 </section>
-<section class="view" id="view-materials">
-  <div class="section-intro"><div><div class="eyebrow">PAPER & CONSUMABLES</div><h2>Material register</h2><p>Record the paper type, GSM, quantity and where it was sent.</p></div><span class="date-chip">STOCK / JOB RECORDS</span></div>
-  <section class="panel"><div class="panel-head"><div><div class="eyebrow">NEW ENTRY</div><h3>Add printing material</h3></div></div>
-  <form id="materialForm" class="material-form">
-    <label>Paper name / GSM<select id="paperType"><option>300 GSM</option><option>250 GSM</option><option>200 GSM</option><option>170 GSM</option><option>150 GSM</option><option>130 GSM</option><option>120 GSM</option><option>100 GSM</option><option>80 GSM</option><option>Other</option></select></label>
-    <label>Custom paper name<input id="customPaper" placeholder="If other..." disabled></label>
-    <label>Quantity<input id="paperQty" type="number" min="0.01" step="any" required placeholder="e.g. 500"></label>
-    <label>Unit<select id="paperUnit"><option>Sheets</option><option>Packets</option><option>Kg</option><option>Rolls</option><option>Bundles</option></select></label>
-    <label>Paper size<input id="paperSize" placeholder="A4, 12×18, 20×30..."></label>
-    <label>Supplier / printer<input id="paperSupplier" placeholder="Name (optional)"></label>
-    <label class="wide">Purpose / job<input id="paperPurpose" placeholder="Which job was this material for?"></label>
-    <button class="btn btn-primary" type="submit">Save material entry ↗</button>
-  </form></section>
-  <section class="panel"><div class="panel-head"><div><div class="eyebrow">REGISTER</div><h3>Material history</h3></div><span class="count-pill" id="materialCount">0 ENTRIES</span></div><div id="materialsTable" class="table-wrap"></div></section>
+<section class="view" id="view-completed">
+  <div class="page-intro"><div><div class="kicker">PRODUCTION COMPLETE</div><h2>Finished work</h2><p>Completed jobs and their machine, work type and material details.</p></div></div>
+  <div class="filter-bar"><span class="subtle-label" id="completedSummary">ALL COMPLETED JOBS</span><input id="completedSearch" class="search-field" placeholder="Search finished work..."></div>
+  <div id="completedList" class="job-list job-list-large"></div>
 </section>
 <section class="view" id="view-history">
-  <div class="section-intro"><div><div class="eyebrow">YOUR RECORDS</div><h2>Daily history</h2><p>Look back at your work and completed jobs by date.</p></div><input class="search-input" id="historySearch" placeholder="Search work or date..."></div>
+  <div class="page-intro"><div><div class="kicker">DAILY RECORDS</div><h2>Production history</h2><p>See when jobs were taken, carried forward and completed.</p></div><input id="historySearch" class="search-field" placeholder="Search date or job..."></div>
   <div id="historyList" class="history-list"></div>
 </section>
-<footer><span>PRINTLOG <b>·</b> PRINTING WORK TRACKER</span><span>Built for the everyday print floor.</span></footer>
+<section class="view" id="view-setup">
+  <div class="page-intro"><div><div class="kicker">CUSTOMIZE YOUR WORKSPACE</div><h2>Setup & lists</h2><p>Add your own machines, work types and materials. These options appear when finishing a job.</p></div></div>
+  <div class="setup-grid">
+    <section class="surface setup-card"><div class="setup-icon">⚙</div><h3>Machines</h3><p>Machines and production equipment available in your shop.</p><form class="catalog-form" data-catalog="machines"><input name="item" placeholder="e.g. Konica 4080" required><button class="button button-primary">Add</button></form><div id="machinesList" class="catalog-list"></div></section>
+    <section class="surface setup-card"><div class="setup-icon">▤</div><h3>Work types</h3><p>Types of jobs you regularly receive from customers.</p><form class="catalog-form" data-catalog="workTypes"><input name="item" placeholder="e.g. Wedding booklet" required><button class="button button-primary">Add</button></form><div id="workTypesList" class="catalog-list"></div></section>
+    <section class="surface setup-card"><div class="setup-icon">▧</div><h3>Materials</h3><p>Paper and other materials used for printing jobs.</p><form class="catalog-form" data-catalog="materials"><input name="item" placeholder="e.g. 300 GSM" required><button class="button button-primary">Add</button></form><div id="materialsList" class="catalog-list"></div></section>
+  </div>
+  <div class="storage-note"><span>ⓘ</span><div><b>Your data stays in this browser</b><p>Jobs and custom lists are saved locally on this device. Export a backup regularly. Clearing browser data or switching devices will not carry records over automatically.</p></div></div>
+</section>
+<footer><span>PRINTLOG <b>·</b> PRODUCTION DESK</span><span>Simple records. Clear production.</span></footer>
 </main>
 </div>
-<div id="toast" role="status"></div>
+<div class="modal-backdrop" id="jobModal" aria-hidden="true"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="jobModalTitle"><div class="modal-head"><div><div class="kicker">NEW JOB ENTRY</div><h2 id="jobModalTitle">Add a job</h2></div><button class="icon-button" data-close-modal="jobModal" aria-label="Close">×</button></div><form id="jobForm" class="modal-form"><label>Job / customer work<input id="jobTitle" required maxlength="140" placeholder="e.g. 500 wedding invitation cards"></label><label>Customer name <span class="optional">OPTIONAL</span><input id="jobCustomer" maxlength="100" placeholder="Customer or business name"></label><label>Details / instructions <span class="optional">OPTIONAL</span><textarea id="jobNotes" rows="3" maxlength="500" placeholder="Size, quantity, deadline or other details..."></textarea></label><div class="form-row"><label>Initial status<select id="jobStatus"><option value="not_started">Not started</option><option value="in_progress">In progress</option></select></label><label>Date taken<input id="jobDate" type="date" required></label></div><div class="modal-actions"><button type="button" class="button button-ghost" data-close-modal="jobModal">Cancel</button><button class="button button-primary" type="submit">Save job</button></div></form></section></div>
+<div class="modal-backdrop" id="finishModal" aria-hidden="true"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="finishModalTitle"><div class="modal-head"><div><div class="kicker">PRODUCTION RECORD</div><h2 id="finishModalTitle">Finish this job</h2><p id="finishJobName" class="modal-subtitle"></p></div><button class="icon-button" data-close-modal="finishModal" aria-label="Close">×</button></div><form id="finishForm" class="modal-form"><label>Machine used<select id="finishMachine" required></select></label><label>Kind of work<select id="finishWorkType" required></select></label><fieldset class="material-picker"><legend>Materials used <span class="optional">SELECT ALL THAT APPLY</span></legend><div id="finishMaterials" class="check-grid"></div></fieldset><label>Additional production notes <span class="optional">OPTIONAL</span><textarea id="finishNotes" rows="2" placeholder="Extra details, quantity, finishing, etc."></textarea></label><div class="modal-actions"><button type="button" class="button button-ghost" data-close-modal="finishModal">Cancel</button><button class="button button-primary" type="submit">✓ Confirm finished</button></div></form></section></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <script src="app.js"></script>
 </body></html>
