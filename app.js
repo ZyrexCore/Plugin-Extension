@@ -87,7 +87,7 @@ function renderCompleted(){
   $('completedList').innerHTML=filtered.map(j=>{
     const p=j.production||{};
     const details='<div class="job-note">Machine: '+esc(p.machine||'—')+' · Work: '+esc(p.workType||'—')+' · Materials: '+esc((p.materials||[]).join(', ')||'—')+(p.cost!==undefined&&p.cost!==null&&p.cost!==''?' · Cost: ₹'+esc(p.cost):'')+(p.notes?' · '+esc(p.notes):'')+'</div>';
-    return '<article class="job-card"><div class="job-card-main"><div class="job-title">'+esc(j.title)+'</div><div class="job-meta"><span>Taken '+fmt(j.takenDate)+'</span><span>Finished '+fmt(j.completedDate)+'</span>'+(j.customer?'<span>'+esc(j.customer)+'</span>':'')+'</div>'+details+'</div><div class="job-actions">'+statusBadge('finished')+'<button class="small-button" data-action="details" data-id="'+esc(j.id)+'">Details</button></div></article>';
+    return '<article class="job-card"><div class="job-card-main"><div class="job-title">'+esc(j.title)+'</div><div class="job-meta"><span>Taken '+fmt(j.takenDate)+'</span><span>Finished '+fmt(j.completedDate)+'</span>'+(j.customer?'<span>'+esc(j.customer)+'</span>':'')+'</div>'+details+'</div><div class="job-actions">'+statusBadge('finished')+'<button class="small-button" data-action="editProduction" data-id="'+esc(j.id)+'">Edit details</button><button class="small-button" data-action="edit" data-id="'+esc(j.id)+'">Edit job</button></div></article>';
   }).join('')||empty('No finished jobs found.');
 }
 function renderHistory(){
@@ -121,16 +121,25 @@ function openJobModal(job=null){
   $('jobTitle').value=job?.title||'';$('jobCustomer').value=job?.customer||'';
   $('jobDueDate').value=job?.dueDate||'';$('jobNotes').value=job?.notes||'';
   $('jobDate').value=job?.takenDate||today();$('jobStatus').value=job?.status==='in_progress'?'in_progress':'not_started';
-  $('jobDate').disabled=!!job;
+  $('jobDate').disabled=false;
   openModal('jobModal');setTimeout(()=>$('jobTitle').focus(),30)
 }
 function fillSelect(id,items){$(id).innerHTML=items.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('')}
 function openFinishModal(id){
   const job=db.jobs.find(j=>j.id===id);if(!job)return;
   activeJobId=id;$('finishJobName').textContent=job.title;
+  const isEditing=job.status==='finished'&&!!job.production;
+  $('finishModalTitle').textContent=isEditing?'Edit completion details':'Finish this job';
+  $('finishForm').querySelector('[type="submit"]').textContent=isEditing?'Save changes':'✓ Confirm finished';
   fillSelect('finishMachine',db.catalogs.machines);fillSelect('finishWorkType',db.catalogs.workTypes);
-  $('finishMaterials').innerHTML=db.catalogs.materials.map((m,i)=>'<label class="check-option"><input type="checkbox" value="'+esc(m)+'" id="material-'+i+'"><span>'+esc(m)+'</span></label>').join('')||'<span class="optional">Add materials in Setup & lists first.</span>';
-  $('finishNotes').value='';$('finishCost').value=job.production?.cost??'';openModal('finishModal');
+  const p=job.production||{};
+  if(p.machine&&!db.catalogs.machines.includes(p.machine))db.catalogs.machines.push(p.machine);
+  if(p.workType&&!db.catalogs.workTypes.includes(p.workType))db.catalogs.workTypes.push(p.workType);
+  fillSelect('finishMachine',db.catalogs.machines);fillSelect('finishWorkType',db.catalogs.workTypes);
+  $('finishMachine').value=p.machine||'';
+  $('finishWorkType').value=p.workType||'';
+  $('finishMaterials').innerHTML=db.catalogs.materials.map((m,i)=>'<label class="check-option"><input type="checkbox" value="'+esc(m)+'" id="material-'+i+'" '+((p.materials||[]).includes(m)?'checked':'')+'><span>'+esc(m)+'</span></label>').join('')||'<span class="optional">Add materials in Setup & lists first.</span>';
+  $('finishNotes').value=p.notes||'';$('finishCost').value=p.cost??'';openModal('finishModal');
 }
 function showJobDetails(id){
   const j=db.jobs.find(x=>x.id===id);if(!j)return;
@@ -165,7 +174,8 @@ $('finishForm').addEventListener('submit',e=>{
   const materials=[...document.querySelectorAll('#finishMaterials input:checked')].map(x=>x.value);
   job.status='finished';job.completedDate=today();job.carried=false;
   const rawCost=$('finishCost').value.trim();job.production={machine,workType,materials,notes:$('finishNotes').value.trim(),cost:rawCost===''?null:Number(rawCost)};
-  save();closeModal('finishModal');toast('Job marked as finished');
+  const wasFinished=job.status==='finished';job.status='finished';if(!wasFinished)job.completedDate=today();job.carried=false;
+  save();closeModal('finishModal');toast(wasFinished?'Completion details updated':'Job marked as finished');
 });
 document.addEventListener('click',e=>{
   const action=e.target.closest('[data-action]');
@@ -178,6 +188,7 @@ document.addEventListener('click',e=>{
       case 'edit':openJobModal(j);break;
       case 'delete':askConfirm('Delete job?','This job will be permanently removed from your register.',()=>{db.jobs=db.jobs.filter(x=>x.id!==j.id);save();toast('Job deleted')},'Delete job')break;
       case 'details':showJobDetails(j.id);break;
+      case 'editProduction':openFinishModal(j.id);break;
     }
   }
   const remove=e.target.closest('[data-remove-catalog]');
