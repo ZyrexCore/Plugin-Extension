@@ -28,7 +28,30 @@ function load(){
   }catch(e){}
   return fresh;
 }
-let db=load(),activeJobId=null,jobFilter='all',editingJobId=null,confirmAction=null;
+let db=load(),activeJobId=null,jobFilter='all',editingJobId=null,confirmAction=null,dashboardStatus='not_started';
+const SETTINGS_KEY='printlog-settings-v1';
+const defaultSettings={theme:'system',accent:'blue',font:'default',textSize:'normal',contrast:false,underline:false,motion:false,targets:false,focus:false};
+function readSettings(){try{return {...defaultSettings,...JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}')}}catch(e){return {...defaultSettings}}}
+let preferences=readSettings();
+function applyPreferences(){
+  const root=document.documentElement;
+  root.dataset.theme=preferences.theme;root.dataset.accent=preferences.accent;root.dataset.font=preferences.font;root.dataset.textSize=preferences.textSize;
+  root.classList.toggle('high-contrast',!!preferences.contrast);root.classList.toggle('underline-links',!!preferences.underline);
+  root.classList.toggle('reduce-motion',!!preferences.motion);root.classList.toggle('large-targets',!!preferences.targets);root.classList.toggle('focus-visible-always',!!preferences.focus);
+}
+function savePreferences(){localStorage.setItem(SETTINGS_KEY,JSON.stringify(preferences));applyPreferences();$('preferencesSaved').textContent='Saved just now';}
+function syncPreferenceControls(){
+  const ids={settingTheme:'theme',settingAccent:'accent',settingFont:'font',settingTextSize:'textSize',settingContrast:'contrast',settingUnderline:'underline',settingMotion:'motion',settingTargets:'targets',settingFocus:'focus'};
+  Object.entries(ids).forEach(([id,key])=>{const el=$(id);if(el)el.type==='checkbox'?el.checked=!!preferences[key]:el.value=preferences[key]});
+}
+function renderDashboardStatus(){
+  document.querySelectorAll('[data-dashboard-status]').forEach(b=>{const active=b.dataset.dashboardStatus===dashboardStatus;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active))});
+  const jobs=db.jobs.filter(j=>j.status===dashboardStatus).sort((a,b)=>b.activeDate.localeCompare(a.activeDate)||b.takenDate.localeCompare(a.takenDate));
+  $('dashboardStatusList').innerHTML=dashboardStatus==='finished'
+    ?(jobs.map(finishedRow).join('')||empty('No finished jobs yet. Completed work will appear here.'))
+    :(jobs.map(j=>jobCard(j,true)).join('')||empty(dashboardStatus==='in_progress'?'No jobs are currently in progress.':'Nothing is waiting to start.'));
+}
+
 function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
 function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2200)}
 function carryForward(){
@@ -39,8 +62,8 @@ function carryForward(){
 function showView(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
-  $('pageTitle').textContent=({dashboard:'Overview',jobs:'All jobs',completed:'Finished work',history:'History',setup:'Setup & lists'})[name]||'Printlog';
-  if(name==='jobs')renderJobs();if(name==='completed')renderCompleted();if(name==='history')renderHistory();
+  $('pageTitle').textContent=({dashboard:'Overview',jobs:'All jobs',completed:'Finished work',history:'History',setup:'Setup & lists',settings:'Preferences'})[name]||'Printlog';
+  if(name==='jobs')renderJobs();if(name==='completed')renderCompleted();if(name==='history')renderHistory();if(name==='settings')syncPreferenceControls();
 }
 function statusLabel(s){return s==='in_progress'?'In progress':s==='finished'?'Finished':'Not started'}
 function statusBadge(s){return '<span class="status-badge '+s+'">'+statusLabel(s)+'</span>'}
@@ -63,10 +86,8 @@ function renderDashboard(){
   const d=today(),taken=db.jobs.filter(j=>j.takenDate===d),waiting=db.jobs.filter(j=>j.status==='not_started'),progress=db.jobs.filter(j=>j.status==='in_progress'),finished=db.jobs.filter(j=>j.status==='finished'&&j.completedDate===d);
   $('todayDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
   $('metricTaken').textContent=taken.length;$('metricWaiting').textContent=waiting.length;$('metricProgress').textContent=progress.length;$('metricFinished').textContent=finished.length;
-  $('navOpenCount').textContent=waiting.length+progress.length;$('waitingPill').textContent=waiting.length;$('progressPill').textContent=progress.length;
-  $('dashboardWaiting').innerHTML=waiting.slice(0,5).map(j=>jobCard(j,true)).join('')||empty('Nothing waiting to start. New jobs will appear here.');
-  $('dashboardProgress').innerHTML=progress.slice(0,5).map(j=>jobCard(j,true)).join('')||empty('No jobs are currently in progress.');
-  $('dashboardFinished').innerHTML=finished.length?finished.slice(0,5).map(finishedRow).join(''):empty('No jobs finished today yet. Completed jobs will stay in Finished work.');
+  $('navOpenCount').textContent=waiting.length+progress.length;$('waitingPill').textContent=waiting.length;$('progressPill').textContent=progress.length;$('finishedPill').textContent=db.jobs.filter(j=>j.status==='finished').length;
+  renderDashboardStatus();
 }
 function renderJobs(){
   const q=($('jobSearch').value||'').toLowerCase();
@@ -147,6 +168,10 @@ function showJobDetails(id){
   toast('Machine: '+(p.machine||'—')+' · '+(p.workType||'—')+' · '+((p.materials||[]).join(', ')||'No materials')+(p.cost!==undefined&&p.cost!==''?' · ₹'+p.cost:''));
 }
 document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+document.querySelectorAll('[data-dashboard-status]').forEach(b=>b.addEventListener('click',()=>{dashboardStatus=b.dataset.dashboardStatus;renderDashboardStatus()}));
+const preferenceFields={settingTheme:'theme',settingAccent:'accent',settingFont:'font',settingTextSize:'textSize',settingContrast:'contrast',settingUnderline:'underline',settingMotion:'motion',settingTargets:'targets',settingFocus:'focus'};
+Object.entries(preferenceFields).forEach(([id,key])=>$(id).addEventListener('change',e=>{preferences[key]=e.target.type==='checkbox'?e.target.checked:e.target.value;savePreferences()}));
+$('resetPreferences').addEventListener('click',()=>{preferences={...defaultSettings};savePreferences();syncPreferenceControls();});
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.goto)));
 $('quickAddBtn').addEventListener('click',openJobModal);$('jobsAddBtn').addEventListener('click',openJobModal);
 document.querySelectorAll('[data-close-modal]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.closeModal)));
@@ -212,5 +237,5 @@ $('exportBtn').addEventListener('click',()=>{
   const blob=new Blob([JSON.stringify({app:'Printlog',version:2,exportedAt:new Date().toISOString(),...db},null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='printlog-backup-'+today()+'.json';a.click();URL.revokeObjectURL(url);toast('Backup downloaded');
 });
-carryForward();render();
+applyPreferences();syncPreferenceControls();carryForward();render();
 })();
