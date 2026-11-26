@@ -51,7 +51,7 @@ function jobCard(j,compact=false){
   let actions='';
   actions='<button class="small-button" data-action="edit" data-id="'+esc(j.id)+'">Edit</button>';
   if(j.status==='not_started')actions+='<button class="small-button primary" data-action="start" data-id="'+esc(j.id)+'">Start work</button>';
-  if(j.status==='in_progress')actions='<button class="small-button" data-action="wait" data-id="'+esc(j.id)+'">Move to not started</button>';
+  if(j.status==='in_progress')actions+='<button class="small-button" data-action="wait" data-id="'+esc(j.id)+'">Move to not started</button>';
   if(j.status!=='finished')actions+='<button class="small-button finish" data-action="finish" data-id="'+esc(j.id)+'">✓ Finish</button><button class="small-button danger" data-action="delete" data-id="'+esc(j.id)+'" aria-label="Delete job">×</button>';
   return '<article class="job-card"><div class="job-card-main"><div class="job-title">'+esc(j.title)+'</div>'+meta+note+'</div><div class="job-actions">'+statusBadge(j.status)+actions+'</div></article>';
 }
@@ -172,9 +172,9 @@ $('finishForm').addEventListener('submit',e=>{
   const machine=$('finishMachine').value,workType=$('finishWorkType').value;
   if(!machine||!workType){toast('Add a machine and work type in Setup first');return}
   const materials=[...document.querySelectorAll('#finishMaterials input:checked')].map(x=>x.value);
-  job.status='finished';job.completedDate=today();job.carried=false;
+  const wasFinished=job.status==='finished';
+  job.status='finished';if(!wasFinished)job.completedDate=today();job.carried=false;
   const rawCost=$('finishCost').value.trim();job.production={machine,workType,materials,notes:$('finishNotes').value.trim(),cost:rawCost===''?null:Number(rawCost)};
-  const wasFinished=job.status==='finished';job.status='finished';if(!wasFinished)job.completedDate=today();job.carried=false;
   save();closeModal('finishModal');toast(wasFinished?'Completion details updated':'Job marked as finished');
 });
 document.addEventListener('click',e=>{
