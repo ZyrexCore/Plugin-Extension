@@ -224,7 +224,7 @@ document.addEventListener('click',e=>{
   }
 });
 document.querySelectorAll('.catalog-form').forEach(form=>form.addEventListener('submit',e=>{
-  e.preventDefault();const key=form.dataset.catalog,input=form.elements.item,value=input.value.trim();
+  e.preventDefault();const key=form.dataset.catalog,input=form.querySelector('input[name="item"]'),value=input?.value.trim()||'';
   if(!value)return;
   if(db.catalogs[key].some(x=>x.toLowerCase()===value.toLowerCase())){toast('That option already exists');return}
   db.catalogs[key].push(value);save();input.value='';toast('New option added');
