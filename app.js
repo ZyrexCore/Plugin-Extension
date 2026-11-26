@@ -186,7 +186,7 @@ document.addEventListener('click',e=>{
       case 'wait':j.status='not_started';save();toast('Job moved to Not started');break;
       case 'finish':openFinishModal(j.id);break;
       case 'edit':openJobModal(j);break;
-      case 'delete':askConfirm('Delete job?','This job will be permanently removed from your register.',()=>{db.jobs=db.jobs.filter(x=>x.id!==j.id);save();toast('Job deleted')},'Delete job')break;
+      case 'delete':askConfirm('Delete job?','This job will be permanently removed from your register.',()=>{db.jobs=db.jobs.filter(x=>x.id!==j.id);save();toast('Job deleted')},'Delete job');break;
       case 'details':showJobDetails(j.id);break;
       case 'editProduction':openFinishModal(j.id);break;
     }
