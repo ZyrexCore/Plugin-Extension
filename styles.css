@@ -60,3 +60,92 @@ footer{display:flex;justify-content:space-between;gap:10px;border-top:1px solid 
 .dashboard-queue{padding:0;overflow:hidden}.status-tabs{display:flex;gap:5px;padding:12px 14px;border-bottom:1px solid var(--line);overflow-x:auto}.status-tab{display:flex;align-items:center;gap:7px;border:1px solid transparent;border-radius:8px;background:transparent;padding:10px 13px;color:var(--muted);font-size:11px;font-weight:700;white-space:nowrap}.status-tab b{font-size:10px;background:var(--bg);border-radius:20px;padding:3px 7px}.status-tab.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-soft)}.dashboard-queue>.job-list{padding:14px}
 .preferences-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.preference-card{padding:19px}.preference-heading{display:flex;align-items:center;gap:11px;margin-bottom:18px}.preference-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-weight:700}.preference-heading h3{font:600 14px var(--display);margin:0 0 4px}.preference-heading p{margin:0;color:var(--muted);font-size:10px}.setting-field{display:grid;gap:7px;margin:12px 0;color:var(--ink);font-size:10px;font-weight:700}.setting-field select{height:39px;width:100%;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);padding:0 10px;font-size:11px}.setting-toggle{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}.setting-toggle b,.setting-toggle small{display:block}.setting-toggle b{font-size:10px}.setting-toggle small{margin-top:4px;color:var(--muted);font-size:9px;line-height:1.5}.setting-toggle input{width:17px;height:17px;accent-color:var(--accent);flex:0 0 auto}.preferences-actions{grid-column:1/-1;display:flex;align-items:center;gap:12px}.preferences-actions span{color:var(--muted);font-size:10px}
 @media(max-width:720px){.preferences-grid{grid-template-columns:1fr}.status-tabs{padding:9px}.status-tab{padding:9px 10px;font-size:10px}.preferences-actions{grid-column:auto;align-items:flex-start;flex-direction:column}}
+
+/* Contrast and legibility pass */
+:root[data-theme="dark"]{
+ --bg:#0d1117;--panel:#171e28;--ink:#f4f7fb;--muted:#c0cad8;--line:#3b4655;--nav:#141b24;
+ --accent-soft:#263a66;--green-soft:#153d31;--amber-soft:#493719;--blue-soft:#1c385c;
+ --green:#65d6a7;--amber:#ffd078;--blue:#8bbaff;--red:#ff9299;
+ --shadow:0 5px 22px rgba(0,0,0,.28);
+ color-scheme:dark
+}
+:root[data-theme="dark"] body{background:var(--bg);color:var(--ink)}
+:root[data-theme="dark"] .sidebar,:root[data-theme="dark"] .topbar,:root[data-theme="dark"] .surface,:root[data-theme="dark"] .metric,:root[data-theme="dark"] .history-day,:root[data-theme="dark"] .preference-card,:root[data-theme="dark"] .modal{background:var(--panel);color:var(--ink);border-color:var(--line)}
+:root[data-theme="dark"] .job-card,:root[data-theme="dark"] .date-pill,:root[data-theme="dark"] .button-ghost,:root[data-theme="dark"] .filter-tab,:root[data-theme="dark"] .search-field,:root[data-theme="dark"] .catalog-form input,:root[data-theme="dark"] .setting-field select,:root[data-theme="dark"] .modal-form input,:root[data-theme="dark"] .modal-form select,:root[data-theme="dark"] .modal-form textarea{background:#202a37;color:var(--ink);border-color:var(--line)}
+:root[data-theme="dark"] .job-card:hover,:root[data-theme="dark"] .small-button:hover{background:#263244;border-color:#52647a}
+:root[data-theme="dark"] .job-title,:root[data-theme="dark"] .metric>b,:root[data-theme="dark"] .topbar h1,:root[data-theme="dark"] .section-heading h2,:root[data-theme="dark"] .page-intro h2,:root[data-theme="dark"] .surface-head h3,:root[data-theme="dark"] .setup-card h3,:root[data-theme="dark"] .preference-heading h3,:root[data-theme="dark"] .history-day-head>b,:root[data-theme="dark"] .history-item b,:root[data-theme="dark"] .finished-row b,:root[data-theme="dark"] .setting-toggle b,:root[data-theme="dark"] .setting-field,:root[data-theme="dark"] .modal-head h2{color:var(--ink)}
+:root[data-theme="dark"] .job-meta,:root[data-theme="dark"] .job-note,:root[data-theme="dark"] .metric-label,:root[data-theme="dark"] .metric>small,:root[data-theme="dark"] .page-intro p,:root[data-theme="dark"] .surface-head small,:root[data-theme="dark"] .finished-row small,:root[data-theme="dark"] .history-day-head small,:root[data-theme="dark"] .history-item small,:root[data-theme="dark"] .setup-card>p,:root[data-theme="dark"] .preference-heading p,:root[data-theme="dark"] .setting-toggle small,:root[data-theme="dark"] .modal-subtitle,:root[data-theme="dark"] .optional,:root[data-theme="dark"] .sidebar-foot small,:root[data-theme="dark"] footer{color:#bdc8d6}
+:root[data-theme="dark"] .nav-item{color:#c4cedb}
+:root[data-theme="dark"] .nav-item:hover,:root[data-theme="dark"] .catalog-item,:root[data-theme="dark"] .finished-row,:root[data-theme="dark"] .sidebar-foot,:root[data-theme="dark"] .check-option,:root[data-theme="dark"] .storage-note{background:#202a37;color:var(--ink);border-color:var(--line)}
+:root[data-theme="dark"] .storage-note p,:root[data-theme="dark"] .storage-note b{color:var(--ink)}
+:root[data-theme="dark"] .nav-item.active,:root[data-theme="dark"] .status-tab.active{background:var(--accent-soft);color:#c9d8ff}
+:root[data-theme="dark"] .status-tab{color:#d0d9e5}
+:root[data-theme="dark"] .status-tab b,:root[data-theme="dark"] .number-pill{background:#2a3544;color:#f0f4fa}
+:root[data-theme="dark"] .status-badge.not_started{background:#493719;color:#ffdc99}
+:root[data-theme="dark"] .status-badge.in_progress{background:#1c385c;color:#b9d8ff}
+:root[data-theme="dark"] .status-badge.finished{background:#153d31;color:#a4f0cf}
+:root[data-theme="dark"] .small-button{background:#202a37;color:#e7edf5;border-color:#465366}
+:root[data-theme="dark"] .small-button.primary{background:var(--accent);color:white;border-color:var(--accent)}
+:root[data-theme="dark"] .small-button.finish{background:#153d31;color:#a4f0cf;border-color:#28674f}
+:root[data-theme="dark"] .small-button.danger{color:#ff9da4}
+:root[data-theme="dark"] .empty-state{color:#c0cad8;border-color:#526174}
+:root[data-theme="dark"] .catalog-item button{color:#c0cad8}
+:root[data-theme="dark"] .icon-button{background:#202a37;color:#e7edf5;border-color:var(--line)}
+:root[data-theme="dark"] .hero{background:linear-gradient(112deg,#151f32,#243b63)}
+:root[data-theme="dark"] .button-ghost{color:#e4ebf5}
+:root[data-theme="dark"] .search-field::placeholder,:root[data-theme="dark"] input::placeholder,:root[data-theme="dark"] textarea::placeholder{color:#9eacbd;opacity:1}
+:root[data-theme="dark"] .modal-form>label,:root[data-theme="dark"] .form-row label,:root[data-theme="dark"] .material-picker legend{color:#e2eaf4}
+:root[data-theme="dark"] .confirm-mark{background:#493719;color:#ffdc99}
+:root[data-theme="dark"] .preferences-actions span{color:#bdc8d6}
+
+@media(prefers-color-scheme:dark){
+/* Contrast and legibility pass */
+:root[data-theme="system"]{
+ --bg:#0d1117;--panel:#171e28;--ink:#f4f7fb;--muted:#c0cad8;--line:#3b4655;--nav:#141b24;
+ --accent-soft:#263a66;--green-soft:#153d31;--amber-soft:#493719;--blue-soft:#1c385c;
+ --green:#65d6a7;--amber:#ffd078;--blue:#8bbaff;--red:#ff9299;
+ --shadow:0 5px 22px rgba(0,0,0,.28);
+ color-scheme:dark
+}
+:root[data-theme="system"] body{background:var(--bg);color:var(--ink)}
+:root[data-theme="system"] .sidebar,:root[data-theme="system"] .topbar,:root[data-theme="system"] .surface,:root[data-theme="system"] .metric,:root[data-theme="system"] .history-day,:root[data-theme="system"] .preference-card,:root[data-theme="system"] .modal{background:var(--panel);color:var(--ink);border-color:var(--line)}
+:root[data-theme="system"] .job-card,:root[data-theme="system"] .date-pill,:root[data-theme="system"] .button-ghost,:root[data-theme="system"] .filter-tab,:root[data-theme="system"] .search-field,:root[data-theme="system"] .catalog-form input,:root[data-theme="system"] .setting-field select,:root[data-theme="system"] .modal-form input,:root[data-theme="system"] .modal-form select,:root[data-theme="system"] .modal-form textarea{background:#202a37;color:var(--ink);border-color:var(--line)}
+:root[data-theme="system"] .job-card:hover,:root[data-theme="system"] .small-button:hover{background:#263244;border-color:#52647a}
+:root[data-theme="system"] .job-title,:root[data-theme="system"] .metric>b,:root[data-theme="system"] .topbar h1,:root[data-theme="system"] .section-heading h2,:root[data-theme="system"] .page-intro h2,:root[data-theme="system"] .surface-head h3,:root[data-theme="system"] .setup-card h3,:root[data-theme="system"] .preference-heading h3,:root[data-theme="system"] .history-day-head>b,:root[data-theme="system"] .history-item b,:root[data-theme="system"] .finished-row b,:root[data-theme="system"] .setting-toggle b,:root[data-theme="system"] .setting-field,:root[data-theme="system"] .modal-head h2{color:var(--ink)}
+:root[data-theme="system"] .job-meta,:root[data-theme="system"] .job-note,:root[data-theme="system"] .metric-label,:root[data-theme="system"] .metric>small,:root[data-theme="system"] .page-intro p,:root[data-theme="system"] .surface-head small,:root[data-theme="system"] .finished-row small,:root[data-theme="system"] .history-day-head small,:root[data-theme="system"] .history-item small,:root[data-theme="system"] .setup-card>p,:root[data-theme="system"] .preference-heading p,:root[data-theme="system"] .setting-toggle small,:root[data-theme="system"] .modal-subtitle,:root[data-theme="system"] .optional,:root[data-theme="system"] .sidebar-foot small,:root[data-theme="system"] footer{color:#bdc8d6}
+:root[data-theme="system"] .nav-item{color:#c4cedb}
+:root[data-theme="system"] .nav-item:hover,:root[data-theme="system"] .catalog-item,:root[data-theme="system"] .finished-row,:root[data-theme="system"] .sidebar-foot,:root[data-theme="system"] .check-option,:root[data-theme="system"] .storage-note{background:#202a37;color:var(--ink);border-color:var(--line)}
+:root[data-theme="system"] .storage-note p,:root[data-theme="system"] .storage-note b{color:var(--ink)}
+:root[data-theme="system"] .nav-item.active,:root[data-theme="system"] .status-tab.active{background:var(--accent-soft);color:#c9d8ff}
+:root[data-theme="system"] .status-tab{color:#d0d9e5}
+:root[data-theme="system"] .status-tab b,:root[data-theme="system"] .number-pill{background:#2a3544;color:#f0f4fa}
+:root[data-theme="system"] .status-badge.not_started{background:#493719;color:#ffdc99}
+:root[data-theme="system"] .status-badge.in_progress{background:#1c385c;color:#b9d8ff}
+:root[data-theme="system"] .status-badge.finished{background:#153d31;color:#a4f0cf}
+:root[data-theme="system"] .small-button{background:#202a37;color:#e7edf5;border-color:#465366}
+:root[data-theme="system"] .small-button.primary{background:var(--accent);color:white;border-color:var(--accent)}
+:root[data-theme="system"] .small-button.finish{background:#153d31;color:#a4f0cf;border-color:#28674f}
+:root[data-theme="system"] .small-button.danger{color:#ff9da4}
+:root[data-theme="system"] .empty-state{color:#c0cad8;border-color:#526174}
+:root[data-theme="system"] .catalog-item button{color:#c0cad8}
+:root[data-theme="system"] .icon-button{background:#202a37;color:#e7edf5;border-color:var(--line)}
+:root[data-theme="system"] .hero{background:linear-gradient(112deg,#151f32,#243b63)}
+:root[data-theme="system"] .button-ghost{color:#e4ebf5}
+:root[data-theme="system"] .search-field::placeholder,:root[data-theme="system"] input::placeholder,:root[data-theme="system"] textarea::placeholder{color:#9eacbd;opacity:1}
+:root[data-theme="system"] .modal-form>label,:root[data-theme="system"] .form-row label,:root[data-theme="system"] .material-picker legend{color:#e2eaf4}
+:root[data-theme="system"] .confirm-mark{background:#493719;color:#ffdc99}
+:root[data-theme="system"] .preferences-actions span{color:#bdc8d6}
+
+}
+
+/* Readable type scale: the smallest interface labels are raised too. */
+:root[data-text-size="normal"]{--smallest-type:11px;--small-type:12px;--body-type:14px}
+:root[data-text-size="large"]{--smallest-type:12px;--small-type:13px;--body-type:15px}
+:root[data-text-size="larger"]{--smallest-type:14px;--small-type:15px;--body-type:17px}
+body{font-size:var(--body-type,14px)}
+.kicker,.nav-caption,.brand small,.metric-label,.metric>small,.job-meta,.job-note,.small-button,.status-badge,.finished-row b,.finished-row small,.page-intro p,.filter-tab,.search-field,.subtle-label,.history-day-head small,.history-item,.setup-card>p,.catalog-form input,.catalog-item,.storage-note p,.storage-note b,footer,.modal-form>label,.form-row label,.modal-form input,.modal-form select,.modal-form textarea,.material-picker legend,.check-option,.optional,.modal-subtitle,.setting-field,.setting-field select,.setting-toggle b,.setting-toggle small,.preferences-actions span,.nav-item,.sidebar-foot b,.sidebar-foot small,.link-button,.empty-state,.surface-head small,.date-pill{
+ font-size:max(var(--smallest-type,11px),1em)
+}
+.job-title{font-size:max(var(--small-type,12px),1em)}
+:where(button,input,select,textarea){line-height:1.4}
+:where(.job-meta,.job-note,.page-intro p,.setup-card>p,.storage-note p,.setting-toggle small,.modal-subtitle){line-height:1.65}
