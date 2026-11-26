@@ -195,7 +195,7 @@ document.addEventListener('click',e=>{
   if(remove){
     const key=remove.dataset.removeCatalog,index=Number(remove.dataset.index);
     const item=db.catalogs[key]?.[index];if(!item)return;
-    if(confirm('Remove "'+item+'" from your options? Existing finished job records will stay unchanged.')){db.catalogs[key].splice(index,1);save();toast('Option removed')}
+    askConfirm('Remove this option?','“'+item+'” will be removed from your selectable options. Existing finished job records will stay unchanged.',()=>{db.catalogs[key].splice(index,1);save();toast('Option removed')},'Remove option')
   }
 });
 document.querySelectorAll('.catalog-form').forEach(form=>form.addEventListener('submit',e=>{
