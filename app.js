@@ -28,7 +28,7 @@ function load(){
   }catch(e){}
   return fresh;
 }
-let db=load(),activeJobId=null,jobFilter='all';
+let db=load(),activeJobId=null,jobFilter='all',editingJobId=null,confirmAction=null;
 function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
 function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2200)}
 function carryForward(){
@@ -46,10 +46,11 @@ function statusLabel(s){return s==='in_progress'?'In progress':s==='finished'?'F
 function statusBadge(s){return '<span class="status-badge '+s+'">'+statusLabel(s)+'</span>'}
 function empty(message){return '<div class="empty-state">'+message+'</div>'}
 function jobCard(j,compact=false){
-  const meta='<div class="job-meta"><span>Taken '+fmt(j.takenDate)+'</span>'+(j.carried?'<span>↪ Carried forward</span>':'')+(j.customer?'<span>'+esc(j.customer)+'</span>':'')+'</div>';
+  const meta='<div class="job-meta"><span>Taken '+fmt(j.takenDate)+'</span>'+(j.dueDate?'<span>Due '+fmt(j.dueDate)+'</span>':'')+(j.carried?'<span>↪ Carried forward</span>':'')+(j.customer?'<span>Contact: '+esc(j.customer)+'</span>':'')+'</div>';
   const note=j.notes?'<div class="job-note">'+esc(j.notes)+'</div>':'';
   let actions='';
-  if(j.status==='not_started')actions='<button class="small-button primary" data-action="start" data-id="'+esc(j.id)+'">Start work</button>';
+  actions='<button class="small-button" data-action="edit" data-id="'+esc(j.id)+'">Edit</button>';
+  if(j.status==='not_started')actions+='<button class="small-button primary" data-action="start" data-id="'+esc(j.id)+'">Start work</button>';
   if(j.status==='in_progress')actions='<button class="small-button" data-action="wait" data-id="'+esc(j.id)+'">Move to not started</button>';
   if(j.status!=='finished')actions+='<button class="small-button finish" data-action="finish" data-id="'+esc(j.id)+'">✓ Finish</button><button class="small-button danger" data-action="delete" data-id="'+esc(j.id)+'" aria-label="Delete job">×</button>';
   return '<article class="job-card"><div class="job-card-main"><div class="job-title">'+esc(j.title)+'</div>'+meta+note+'</div><div class="job-actions">'+statusBadge(j.status)+actions+'</div></article>';
@@ -76,7 +77,7 @@ function renderJobs(){
 }
 function productionText(j){
   const p=j.production||{};
-  return [p.machine,p.workType,...(p.materials||[]),p.notes].filter(Boolean).join(' ').toLowerCase();
+  return [p.machine,p.workType,...(p.materials||[]),p.notes,p.cost].filter(Boolean).join(' ').toLowerCase();
 }
 function renderCompleted(){
   const q=($('completedSearch').value||'').toLowerCase();
@@ -85,8 +86,8 @@ function renderCompleted(){
   $('completedSummary').textContent=jobs.length+' FINISHED JOB'+(jobs.length===1?'':'S');
   $('completedList').innerHTML=filtered.map(j=>{
     const p=j.production||{};
-    const details='<div class="job-note">Machine: '+esc(p.machine||'—')+' · Work: '+esc(p.workType||'—')+' · Materials: '+esc((p.materials||[]).join(', ')||'—')+(p.notes?' · '+esc(p.notes):'')+'</div>';
-    return '<article class="job-card"><div class="job-card-main"><div class="job-title">'+esc(j.title)+'</div><div class="job-meta"><span>Taken '+fmt(j.takenDate)+'</span><span>Finished '+fmt(j.completedDate)+'</span>'+(j.customer?'<span>'+esc(j.customer)+'</span>':'')+'</div>'+details+'</div><div class="job-actions">'+statusBadge('finished')+'<button class="small-button" data-action="details" data-id="'+esc(j.id)+'">Details</button></div></article>';
+    const details='<div class="job-note">Machine: '+esc(p.machine||'—')+' · Work: '+esc(p.workType||'—')+' · Materials: '+esc((p.materials||[]).join(', ')||'—')+(p.cost!==undefined&&p.cost!==null&&p.cost!==''?' · Cost: ₹'+esc(p.cost):'')+(p.notes?' · '+esc(p.notes):'')+'</div>';
+    return '<article class="job-card"><div class="job-card-main"><div class="job-title">'+esc(j.title)+'</div><div class="job-meta"><span>Taken '+fmt(j.takenDate)+'</span><span>Finished '+fmt(j.completedDate)+'</span>'+(j.customer?'<span>'+esc(j.customer)+'</span>':'')+'</div>'+details+'</div><div class="job-actions">'+statusBadge('finished')+'<button class="small-button" data-action="editProduction" data-id="'+esc(j.id)+'">Edit details</button><button class="small-button" data-action="edit" data-id="'+esc(j.id)+'">Edit job</button></div></article>';
   }).join('')||empty('No finished jobs found.');
 }
 function renderHistory(){
@@ -109,31 +110,62 @@ function renderSetup(){['machines','workTypes','materials'].forEach(renderCatalo
 function render(){renderDashboard();renderJobs();renderCompleted();renderHistory();renderSetup()}
 function openModal(id){$(id).classList.add('open');$(id).setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
 function closeModal(id){$(id).classList.remove('open');$(id).setAttribute('aria-hidden','true');document.body.style.overflow=''}
-function openJobModal(){ $('jobForm').reset();$('jobDate').value=today();$('jobStatus').value='not_started';openModal('jobModal');setTimeout(()=>$('jobTitle').focus(),30)}
+function askConfirm(title,message,callback,buttonLabel='Confirm'){
+  $('confirmTitle').textContent=title;$('confirmMessage').textContent=message;
+  $('confirmActionBtn').textContent=buttonLabel;confirmAction=callback;openModal('confirmModal');
+}
+function openJobModal(job=null){
+  editingJobId=job?.id||null;$('jobForm').reset();
+  $('jobModalTitle').textContent=job?'Edit job':'Add a job';
+  $('jobModal').querySelector('.kicker').textContent=job?'UPDATE JOB DETAILS':'NEW JOB ENTRY';
+  $('jobTitle').value=job?.title||'';$('jobCustomer').value=job?.customer||'';
+  $('jobDueDate').value=job?.dueDate||'';$('jobNotes').value=job?.notes||'';
+  $('jobDate').value=job?.takenDate||today();$('jobStatus').value=job?.status==='in_progress'?'in_progress':'not_started';
+  $('jobDate').disabled=false;
+  openModal('jobModal');setTimeout(()=>$('jobTitle').focus(),30)
+}
 function fillSelect(id,items){$(id).innerHTML=items.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('')}
 function openFinishModal(id){
   const job=db.jobs.find(j=>j.id===id);if(!job)return;
   activeJobId=id;$('finishJobName').textContent=job.title;
+  const isEditing=job.status==='finished'&&!!job.production;
+  $('finishModalTitle').textContent=isEditing?'Edit completion details':'Finish this job';
+  $('finishForm').querySelector('[type="submit"]').textContent=isEditing?'Save changes':'✓ Confirm finished';
   fillSelect('finishMachine',db.catalogs.machines);fillSelect('finishWorkType',db.catalogs.workTypes);
-  $('finishMaterials').innerHTML=db.catalogs.materials.map((m,i)=>'<label class="check-option"><input type="checkbox" value="'+esc(m)+'" id="material-'+i+'"><span>'+esc(m)+'</span></label>').join('')||'<span class="optional">Add materials in Setup & lists first.</span>';
-  $('finishNotes').value='';openModal('finishModal');
+  const p=job.production||{};
+  if(p.machine&&!db.catalogs.machines.includes(p.machine))db.catalogs.machines.push(p.machine);
+  if(p.workType&&!db.catalogs.workTypes.includes(p.workType))db.catalogs.workTypes.push(p.workType);
+  fillSelect('finishMachine',db.catalogs.machines);fillSelect('finishWorkType',db.catalogs.workTypes);
+  $('finishMachine').value=p.machine||'';
+  $('finishWorkType').value=p.workType||'';
+  $('finishMaterials').innerHTML=db.catalogs.materials.map((m,i)=>'<label class="check-option"><input type="checkbox" value="'+esc(m)+'" id="material-'+i+'" '+((p.materials||[]).includes(m)?'checked':'')+'><span>'+esc(m)+'</span></label>').join('')||'<span class="optional">Add materials in Setup & lists first.</span>';
+  $('finishNotes').value=p.notes||'';$('finishCost').value=p.cost??'';openModal('finishModal');
 }
 function showJobDetails(id){
   const j=db.jobs.find(x=>x.id===id);if(!j)return;
   const p=j.production||{};
-  toast('Machine: '+(p.machine||'—')+' · '+(p.workType||'—')+' · '+((p.materials||[]).join(', ')||'No materials'));
+  toast('Machine: '+(p.machine||'—')+' · '+(p.workType||'—')+' · '+((p.materials||[]).join(', ')||'No materials')+(p.cost!==undefined&&p.cost!==''?' · ₹'+p.cost:''));
 }
 document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.goto)));
 $('quickAddBtn').addEventListener('click',openJobModal);$('jobsAddBtn').addEventListener('click',openJobModal);
 document.querySelectorAll('[data-close-modal]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.closeModal)));
+$('confirmActionBtn').addEventListener('click',()=>{const run=confirmAction;confirmAction=null;closeModal('confirmModal');if(run)run()});
 document.querySelectorAll('.modal-backdrop').forEach(b=>b.addEventListener('click',e=>{if(e.target===b)closeModal(b.id)}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-backdrop.open').forEach(m=>closeModal(m.id))});
 $('jobForm').addEventListener('submit',e=>{
   e.preventDefault();const title=$('jobTitle').value.trim();if(!title)return;
   const date=$('jobDate').value||today();
-  db.jobs.push({id:uid(),title,customer:$('jobCustomer').value.trim(),notes:$('jobNotes').value.trim(),takenDate:date,activeDate:date,status:$('jobStatus').value,completedDate:null,carried:false,production:null});
-  save();closeModal('jobModal');showView('jobs');toast('Job added to the register');
+  if(editingJobId){
+    const job=db.jobs.find(j=>j.id===editingJobId);if(!job)return;
+    job.title=title;job.customer=$('jobCustomer').value.trim();job.dueDate=$('jobDueDate').value||null;job.takenDate=date;job.notes=$('jobNotes').value.trim();
+    if(job.status!=='finished')job.status=$('jobStatus').value;
+    save();closeModal('jobModal');toast('Job details updated');
+  }else{
+    db.jobs.push({id:uid(),title,customer:$('jobCustomer').value.trim(),dueDate:$('jobDueDate').value||null,notes:$('jobNotes').value.trim(),takenDate:date,activeDate:date,status:$('jobStatus').value,completedDate:null,carried:false,production:null});
+    save();closeModal('jobModal');showView('jobs');toast('Job added to the register');
+  }
+  editingJobId=null;$('jobDate').disabled=false;
 });
 $('finishForm').addEventListener('submit',e=>{
   e.preventDefault();const job=db.jobs.find(j=>j.id===activeJobId);if(!job)return;
@@ -141,8 +173,9 @@ $('finishForm').addEventListener('submit',e=>{
   if(!machine||!workType){toast('Add a machine and work type in Setup first');return}
   const materials=[...document.querySelectorAll('#finishMaterials input:checked')].map(x=>x.value);
   job.status='finished';job.completedDate=today();job.carried=false;
-  job.production={machine,workType,materials,notes:$('finishNotes').value.trim()};
-  save();closeModal('finishModal');toast('Job marked as finished');
+  const rawCost=$('finishCost').value.trim();job.production={machine,workType,materials,notes:$('finishNotes').value.trim(),cost:rawCost===''?null:Number(rawCost)};
+  const wasFinished=job.status==='finished';job.status='finished';if(!wasFinished)job.completedDate=today();job.carried=false;
+  save();closeModal('finishModal');toast(wasFinished?'Completion details updated':'Job marked as finished');
 });
 document.addEventListener('click',e=>{
   const action=e.target.closest('[data-action]');
@@ -152,15 +185,17 @@ document.addEventListener('click',e=>{
       case 'start':j.status='in_progress';save();toast('Job moved to In progress');break;
       case 'wait':j.status='not_started';save();toast('Job moved to Not started');break;
       case 'finish':openFinishModal(j.id);break;
-      case 'delete':if(confirm('Delete this job permanently?')){db.jobs=db.jobs.filter(x=>x.id!==j.id);save();toast('Job deleted')}break;
+      case 'edit':openJobModal(j);break;
+      case 'delete':askConfirm('Delete job?','This job will be permanently removed from your register.',()=>{db.jobs=db.jobs.filter(x=>x.id!==j.id);save();toast('Job deleted')},'Delete job')break;
       case 'details':showJobDetails(j.id);break;
+      case 'editProduction':openFinishModal(j.id);break;
     }
   }
   const remove=e.target.closest('[data-remove-catalog]');
   if(remove){
     const key=remove.dataset.removeCatalog,index=Number(remove.dataset.index);
     const item=db.catalogs[key]?.[index];if(!item)return;
-    if(confirm('Remove "'+item+'" from your options? Existing finished job records will stay unchanged.')){db.catalogs[key].splice(index,1);save();toast('Option removed')}
+    askConfirm('Remove this option?','“'+item+'” will be removed from your selectable options. Existing finished job records will stay unchanged.',()=>{db.catalogs[key].splice(index,1);save();toast('Option removed')},'Remove option')
   }
 });
 document.querySelectorAll('.catalog-form').forEach(form=>form.addEventListener('submit',e=>{
