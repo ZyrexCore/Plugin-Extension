@@ -1,41 +1,181 @@
 (() => {
-const KEY='printlog-v1';
+'use strict';
+const KEY='printlog-v2';
+const OLD_KEY='printlog-v1';
+const defaults={
+ machines:['Offset','Banner','Konica 4080','Kyocera'],
+ workTypes:['Booklet','Xerox','Bill Book / Receipt','Stamp','Master'],
+ materials:['300 GSM','170 GSM','130 GSM']
+};
+const $=id=>document.getElementById(id);
 const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-let db=load();
-function load(){try{return JSON.parse(localStorage.getItem(KEY))||{tasks:[],notes:[],materials:[]}}catch{return {tasks:[],notes:[],materials:[]}}}
-function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
-function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function fmt(d){if(!d)return '';return new Date(d+'T12:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
-function rollover(){const d=today();let changed=false;db.tasks.forEach(t=>{if(!t.done&&t.date<d){t.date=d;t.carried=true;changed=true}});if(changed)localStorage.setItem(KEY,JSON.stringify(db))}
-function showView(name){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.getElementById('pageTitle').textContent=({dashboard:'Overview',tasks:'Work & tasks',materials:'Paper & materials',history:'Daily history'})[name];}
-function taskMarkup(t){return '<div class="task-item '+(t.done?'done':'')+'"><button class="task-check" data-task="'+t.id+'" title="'+(t.done?'Completed':'Mark finished')+'">'+(t.done?'✓':'')+'</button><div class="task-copy"><b>'+esc(t.title)+'</b>'+(t.note?'<small>'+esc(t.note)+'</small>':'')+'<small>'+(t.carried?'Carried forward · originally '+fmt(t.created):'Added '+fmt(t.created))+'</small></div>'+(t.carried&&!t.done?'<span class="origin-tag">CARRIED</span>':'')+'<button class="delete-btn" data-delete-task="'+t.id+'" aria-label="Delete task">×</button></div>'}
-function table(rows){if(!rows.length)return '<div class="empty-state">No material entries yet. Add your first record above.</div>';return '<table><thead><tr><th>DATE</th><th>PAPER</th><th>QUANTITY</th><th>SIZE</th><th>SUPPLIER / PRINTER</th><th>PURPOSE</th><th></th></tr></thead><tbody>'+rows.map(m=>'<tr><td>'+fmt(m.date)+'</td><td><span class="gsm-tag">'+esc(m.paper)+'</span></td><td><strong>'+esc(m.qty)+' '+esc(m.unit)+'</strong></td><td>'+esc(m.size||'—')+'</td><td>'+esc(m.supplier||'—')+'</td><td>'+esc(m.purpose||'—')+'</td><td><button class="delete-btn" data-delete-material="'+m.id+'">×</button></td></tr>').join('')+'</tbody></table>'}
-function render(){
- const d=today(),open=db.tasks.filter(t=>!t.done),doneToday=db.tasks.filter(t=>t.done&&t.completed===d),notesToday=db.notes.filter(n=>n.date===d),mats=[...db.materials].sort((a,b)=>b.date.localeCompare(a.date));
- document.getElementById('todayLabel').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
- document.getElementById('taskDateLabel').textContent=fmt(d);
- document.getElementById('statPending').textContent=open.length;document.getElementById('statFinished').textContent=doneToday.length;document.getElementById('statWorked').textContent=notesToday.length;document.getElementById('statMaterials').textContent=mats.length;
- document.getElementById('pendingBadge').textContent=open.length;document.getElementById('pendingCount').textContent=open.length+' OPEN';document.getElementById('openCount').textContent=open.length+' OPEN';document.getElementById('doneCount').textContent=doneToday.length+' DONE';document.getElementById('materialCount').textContent=mats.length+' ENTRIES';
- document.getElementById('todayWorkList').innerHTML=notesToday.length?notesToday.map(n=>'<div class="simple-item">'+esc(n.text)+'<button class="delete-btn" data-delete-note="'+n.id+'">×</button></div>').join(''):'<div class="empty-state">No work updates yet. Add what you worked on today.</div>';
- document.getElementById('dashboardPending').innerHTML=open.slice(0,5).map(taskMarkup).join('')||'<div class="empty-state">All caught up. No pending work.</div>';
- document.getElementById('openTasks').innerHTML=open.map(taskMarkup).join('')||'<div class="empty-state">No pending jobs. Add a task when new work comes in.</div>';
- document.getElementById('doneTasks').innerHTML=doneToday.map(taskMarkup).join('')||'<div class="empty-state">Completed tasks will appear here.</div>';
- document.getElementById('dailyNotes').innerHTML=notesToday.map(n=>'<div class="daily-note"><span>'+esc(n.text)+'</span><button class="delete-btn" data-delete-note="'+n.id+'">×</button></div>').join('')||'<div class="empty-state">Your daily work notes will appear here.</div>';
- document.getElementById('recentMaterials').innerHTML=table(mats.slice(0,5));document.getElementById('materialsTable').innerHTML=table(mats);
- renderHistory();
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}):'—';
+const cloneDefaults=()=>JSON.parse(JSON.stringify(defaults));
+function load(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(KEY));
+    if(saved&&Array.isArray(saved.jobs))return {...saved,catalogs:{...cloneDefaults(),...(saved.catalogs||{})}};
+  }catch(e){}
+  const fresh={jobs:[],catalogs:cloneDefaults()};
+  try{
+    const old=JSON.parse(localStorage.getItem(OLD_KEY));
+    if(old){
+      (old.tasks||[]).forEach(t=>fresh.jobs.push({id:t.id||uid(),title:t.title||'Untitled job',customer:'',notes:t.note||'',takenDate:t.created||today(),activeDate:t.date||today(),status:t.done?'finished':'not_started',completedDate:t.done?(t.completed||today()):null,carried:!!t.carried,production:t.done?{machine:'Not recorded',workType:'Not recorded',materials:[],notes:'Imported from previous Printlog'}:null}));
+      (old.materials||[]).forEach(m=>{const label=m.paper||'';if(label&&!fresh.catalogs.materials.includes(label))fresh.catalogs.materials.push(label)});
+    }
+  }catch(e){}
+  return fresh;
 }
-function renderHistory(){const q=(document.getElementById('historySearch')?.value||'').toLowerCase();const dates=[...new Set([...db.tasks.map(t=>t.created),...db.tasks.filter(t=>t.done).map(t=>t.completed),...db.notes.map(n=>n.date),...db.materials.map(m=>m.date)])].sort((a,b)=>b.localeCompare(a));const html=dates.map(date=>{const tasks=db.tasks.filter(t=>t.created===date||t.completed===date);const notes=db.notes.filter(n=>n.date===date);const mats=db.materials.filter(m=>m.date===date);const text=[...tasks.map(t=>t.title),...notes.map(n=>n.text),...mats.map(m=>m.paper)].join(' ').toLowerCase();if(q&&!date.includes(q)&&!text.includes(q))return '';return '<article class="history-day"><div class="history-day-head"><b>'+fmt(date)+'</b><small>'+tasks.filter(t=>t.done&&t.completed===date).length+' FINISHED · '+tasks.filter(t=>!t.done).length+' OPEN · '+mats.length+' MATERIALS</small></div><div class="history-columns"><div><h4>WORKED ON / UPDATES</h4>'+((notes.filter(n=>n.date===date).map(n=>'<p>↳ '+esc(n.text)+'</p>').join(''))||'<p>—</p>')+'<h4 style="margin-top:12px">TASKS FINISHED</h4>'+((tasks.filter(t=>t.done&&t.completed===date).map(t=>'<p>✓ '+esc(t.title)+'</p>').join(''))||'<p>—</p>')+'</div><div><h4>OPEN TASKS / TASKS STARTED</h4>'+((tasks.filter(t=>t.created===date&&!t.done).map(t=>'<p>○ '+esc(t.title)+'</p>').join(''))||'<p>—</p>')+'<h4 style="margin-top:12px">MATERIALS</h4>'+((mats.map(m=>'<p>'+esc(m.paper)+' · '+esc(m.qty)+' '+esc(m.unit)+'</p>').join(''))||'<p>—</p>')+'</div></div></article>'}).filter(Boolean).join('');document.getElementById('historyList').innerHTML=html||'<div class="empty-state">No matching history yet.</div>'}
-document.querySelectorAll('.nav-link').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+let db=load(),activeJobId=null,jobFilter='all';
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2200)}
+function carryForward(){
+  const d=today();let changed=false;
+  db.jobs.forEach(j=>{if(j.status!=='finished'&&j.activeDate<d){j.activeDate=d;j.carried=true;changed=true}});
+  if(changed)localStorage.setItem(KEY,JSON.stringify(db));
+}
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
+  $('pageTitle').textContent=({dashboard:'Overview',jobs:'All jobs',completed:'Finished work',history:'History',setup:'Setup & lists'})[name]||'Printlog';
+  if(name==='jobs')renderJobs();if(name==='completed')renderCompleted();if(name==='history')renderHistory();
+}
+function statusLabel(s){return s==='in_progress'?'In progress':s==='finished'?'Finished':'Not started'}
+function statusBadge(s){return '<span class="status-badge '+s+'">'+statusLabel(s)+'</span>'}
+function empty(message){return '<div class="empty-state">'+message+'</div>'}
+function jobCard(j,compact=false){
+  const meta='<div class="job-meta"><span>Taken '+fmt(j.takenDate)+'</span>'+(j.carried?'<span>↪ Carried forward</span>':'')+(j.customer?'<span>'+esc(j.customer)+'</span>':'')+'</div>';
+  const note=j.notes?'<div class="job-note">'+esc(j.notes)+'</div>':'';
+  let actions='';
+  if(j.status==='not_started')actions='<button class="small-button primary" data-action="start" data-id="'+esc(j.id)+'">Start work</button>';
+  if(j.status==='in_progress')actions='<button class="small-button" data-action="wait" data-id="'+esc(j.id)+'">Move to not started</button>';
+  if(j.status!=='finished')actions+='<button class="small-button finish" data-action="finish" data-id="'+esc(j.id)+'">✓ Finish</button><button class="small-button danger" data-action="delete" data-id="'+esc(j.id)+'" aria-label="Delete job">×</button>';
+  return '<article class="job-card"><div class="job-card-main"><div class="job-title">'+esc(j.title)+'</div>'+meta+note+'</div><div class="job-actions">'+statusBadge(j.status)+actions+'</div></article>';
+}
+function finishedRow(j){
+  const p=j.production||{};
+  return '<div class="finished-row"><div class="finished-check">✓</div><div><b>'+esc(j.title)+'</b><small>'+fmt(j.completedDate)+' · '+esc(p.machine||'Machine not recorded')+' · '+esc(p.workType||'Work type not recorded')+'</small></div><button class="small-button" data-action="details" data-id="'+esc(j.id)+'">Details</button></div>';
+}
+function renderDashboard(){
+  const d=today(),taken=db.jobs.filter(j=>j.takenDate===d),waiting=db.jobs.filter(j=>j.status==='not_started'),progress=db.jobs.filter(j=>j.status==='in_progress'),finished=db.jobs.filter(j=>j.status==='finished'&&j.completedDate===d);
+  $('todayDate').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  $('metricTaken').textContent=taken.length;$('metricWaiting').textContent=waiting.length;$('metricProgress').textContent=progress.length;$('metricFinished').textContent=finished.length;
+  $('navOpenCount').textContent=waiting.length+progress.length;$('waitingPill').textContent=waiting.length;$('progressPill').textContent=progress.length;
+  $('dashboardWaiting').innerHTML=waiting.slice(0,5).map(j=>jobCard(j,true)).join('')||empty('Nothing waiting to start. New jobs will appear here.');
+  $('dashboardProgress').innerHTML=progress.slice(0,5).map(j=>jobCard(j,true)).join('')||empty('No jobs are currently in progress.');
+  $('dashboardFinished').innerHTML=finished.length?finished.slice(0,5).map(finishedRow).join(''):empty('No jobs finished today yet. Completed jobs will stay in Finished work.');
+}
+function renderJobs(){
+  const q=($('jobSearch').value||'').toLowerCase();
+  let jobs=db.jobs.filter(j=>j.status!=='finished');
+  if(jobFilter!=='all')jobs=jobs.filter(j=>j.status===jobFilter);
+  jobs=jobs.filter(j=>[j.title,j.customer,j.notes].join(' ').toLowerCase().includes(q)).sort((a,b)=>b.activeDate.localeCompare(a.activeDate)||b.takenDate.localeCompare(a.takenDate));
+  $('allJobsList').innerHTML=jobs.map(j=>jobCard(j)).join('')||empty('No jobs match this view. Add a new job when work comes in.');
+}
+function productionText(j){
+  const p=j.production||{};
+  return [p.machine,p.workType,...(p.materials||[]),p.notes].filter(Boolean).join(' ').toLowerCase();
+}
+function renderCompleted(){
+  const q=($('completedSearch').value||'').toLowerCase();
+  const jobs=db.jobs.filter(j=>j.status==='finished').sort((a,b)=>(b.completedDate||'').localeCompare(a.completedDate||''));
+  const filtered=jobs.filter(j=>[j.title,j.customer,j.notes,productionText(j)].join(' ').toLowerCase().includes(q));
+  $('completedSummary').textContent=jobs.length+' FINISHED JOB'+(jobs.length===1?'':'S');
+  $('completedList').innerHTML=filtered.map(j=>{
+    const p=j.production||{};
+    const details='<div class="job-note">Machine: '+esc(p.machine||'—')+' · Work: '+esc(p.workType||'—')+' · Materials: '+esc((p.materials||[]).join(', ')||'—')+(p.notes?' · '+esc(p.notes):'')+'</div>';
+    return '<article class="job-card"><div class="job-card-main"><div class="job-title">'+esc(j.title)+'</div><div class="job-meta"><span>Taken '+fmt(j.takenDate)+'</span><span>Finished '+fmt(j.completedDate)+'</span>'+(j.customer?'<span>'+esc(j.customer)+'</span>':'')+'</div>'+details+'</div><div class="job-actions">'+statusBadge('finished')+'<button class="small-button" data-action="details" data-id="'+esc(j.id)+'">Details</button></div></article>';
+  }).join('')||empty('No finished jobs found.');
+}
+function renderHistory(){
+  const q=($('historySearch').value||'').toLowerCase();
+  const dates=[...new Set(db.jobs.flatMap(j=>[j.takenDate,j.activeDate,j.completedDate].filter(Boolean)))].sort((a,b)=>b.localeCompare(a));
+  const blocks=dates.map(date=>{
+    const taken=db.jobs.filter(j=>j.takenDate===date),carried=db.jobs.filter(j=>j.carried&&j.activeDate===date&&j.status!=='finished'&&j.takenDate!==date),done=db.jobs.filter(j=>j.completedDate===date);
+    const all=[...taken,...carried.filter(j=>!taken.some(t=>t.id===j.id)),...done.filter(j=>!taken.some(t=>t.id===j.id))];
+    const filtered=all.filter(j=>[j.title,j.customer,j.notes,productionText(j)].join(' ').toLowerCase().includes(q));
+    if(!filtered.length)return '';
+    return '<article class="history-day"><div class="history-day-head"><b>'+fmt(date)+'</b><small>'+taken.length+' TAKEN · '+carried.length+' CARRIED · '+done.length+' FINISHED</small></div><div class="history-items">'+filtered.map(j=>'<div class="history-item"><span class="status-dot '+(j.status==='finished'?'finished':j.status==='in_progress'?'progress':'waiting')+'"></span><b>'+esc(j.title)+'</b><small>'+(j.completedDate===date?'Finished':j.takenDate===date?'Taken':'Carried forward')+'</small></div>').join('')+'</div></article>';
+  }).filter(Boolean).join('');
+  $('historyList').innerHTML=blocks||empty('No history found for that search.');
+}
+function renderCatalog(key){
+  const target=$(key+'List');
+  target.innerHTML=db.catalogs[key].map((item,index)=>'<div class="catalog-item"><span>'+esc(item)+'</span><button type="button" data-remove-catalog="'+key+'" data-index="'+index+'" aria-label="Remove '+esc(item)+'">×</button></div>').join('')||empty('No options added yet.');
+}
+function renderSetup(){['machines','workTypes','materials'].forEach(renderCatalog)}
+function render(){renderDashboard();renderJobs();renderCompleted();renderHistory();renderSetup()}
+function openModal(id){$(id).classList.add('open');$(id).setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
+function closeModal(id){$(id).classList.remove('open');$(id).setAttribute('aria-hidden','true');document.body.style.overflow=''}
+function openJobModal(){ $('jobForm').reset();$('jobDate').value=today();$('jobStatus').value='not_started';openModal('jobModal');setTimeout(()=>$('jobTitle').focus(),30)}
+function fillSelect(id,items){$(id).innerHTML=items.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('')}
+function openFinishModal(id){
+  const job=db.jobs.find(j=>j.id===id);if(!job)return;
+  activeJobId=id;$('finishJobName').textContent=job.title;
+  fillSelect('finishMachine',db.catalogs.machines);fillSelect('finishWorkType',db.catalogs.workTypes);
+  $('finishMaterials').innerHTML=db.catalogs.materials.map((m,i)=>'<label class="check-option"><input type="checkbox" value="'+esc(m)+'" id="material-'+i+'"><span>'+esc(m)+'</span></label>').join('')||'<span class="optional">Add materials in Setup & lists first.</span>';
+  $('finishNotes').value='';openModal('finishModal');
+}
+function showJobDetails(id){
+  const j=db.jobs.find(x=>x.id===id);if(!j)return;
+  const p=j.production||{};
+  toast('Machine: '+(p.machine||'—')+' · '+(p.workType||'—')+' · '+((p.materials||[]).join(', ')||'No materials'));
+}
+document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.goto)));
-document.getElementById('taskForm').addEventListener('submit',e=>{e.preventDefault();const title=document.getElementById('taskInput').value.trim();if(!title)return;db.tasks.push({id:uid(),title,note:document.getElementById('taskNote').value.trim(),created:today(),date:today(),done:false,carried:false});e.target.reset();save();toast('Task added to your work list')});
-function addNote(){const input=document.getElementById('dailyNoteInput')||document.getElementById('workInput');const text=input.value.trim();if(!text)return;db.notes.push({id:uid(),text,date:today()});input.value='';save();toast('Work update saved')}
-document.getElementById('noteForm').addEventListener('submit',e=>{e.preventDefault();addNote()});document.getElementById('addWorkBtn').addEventListener('click',addNote);document.getElementById('workInput').addEventListener('keydown',e=>{if(e.key==='Enter')addNote()});
-document.addEventListener('click',e=>{const t=e.target.closest('[data-task]');if(t){const item=db.tasks.find(x=>x.id===t.dataset.task);if(item){item.done=!item.done;item.completed=item.done?today():null;item.carried=false;save();toast(item.done?'Marked as finished':'Moved back to pending')}}const dt=e.target.closest('[data-delete-task]');if(dt){db.tasks=db.tasks.filter(x=>x.id!==dt.dataset.deleteTask);save();toast('Task deleted')}const dn=e.target.closest('[data-delete-note]');if(dn){db.notes=db.notes.filter(x=>x.id!==dn.dataset.deleteNote);save()}const dm=e.target.closest('[data-delete-material]');if(dm){db.materials=db.materials.filter(x=>x.id!==dm.dataset.deleteMaterial);save();toast('Material entry deleted')}});
-document.getElementById('paperType').addEventListener('change',e=>{document.getElementById('customPaper').disabled=e.target.value!=='Other';if(e.target.value!=='Other')document.getElementById('customPaper').value=''});
-document.getElementById('materialForm').addEventListener('submit',e=>{e.preventDefault();const paper=document.getElementById('paperType').value==='Other'?document.getElementById('customPaper').value.trim():document.getElementById('paperType').value;if(!paper){toast('Enter a paper name');return}db.materials.push({id:uid(),date:today(),paper,qty:document.getElementById('paperQty').value,unit:document.getElementById('paperUnit').value,size:document.getElementById('paperSize').value.trim(),supplier:document.getElementById('paperSupplier').value.trim(),purpose:document.getElementById('paperPurpose').value.trim()});e.target.reset();document.getElementById('customPaper').disabled=true;save();toast('Material record saved')});
-document.getElementById('historySearch').addEventListener('input',renderHistory);
-document.getElementById('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='printlog-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href);toast('Backup downloaded')});
-rollover();render();
+$('quickAddBtn').addEventListener('click',openJobModal);$('jobsAddBtn').addEventListener('click',openJobModal);
+document.querySelectorAll('[data-close-modal]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.closeModal)));
+document.querySelectorAll('.modal-backdrop').forEach(b=>b.addEventListener('click',e=>{if(e.target===b)closeModal(b.id)}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-backdrop.open').forEach(m=>closeModal(m.id))});
+$('jobForm').addEventListener('submit',e=>{
+  e.preventDefault();const title=$('jobTitle').value.trim();if(!title)return;
+  const date=$('jobDate').value||today();
+  db.jobs.push({id:uid(),title,customer:$('jobCustomer').value.trim(),notes:$('jobNotes').value.trim(),takenDate:date,activeDate:date,status:$('jobStatus').value,completedDate:null,carried:false,production:null});
+  save();closeModal('jobModal');showView('jobs');toast('Job added to the register');
+});
+$('finishForm').addEventListener('submit',e=>{
+  e.preventDefault();const job=db.jobs.find(j=>j.id===activeJobId);if(!job)return;
+  const machine=$('finishMachine').value,workType=$('finishWorkType').value;
+  if(!machine||!workType){toast('Add a machine and work type in Setup first');return}
+  const materials=[...document.querySelectorAll('#finishMaterials input:checked')].map(x=>x.value);
+  job.status='finished';job.completedDate=today();job.carried=false;
+  job.production={machine,workType,materials,notes:$('finishNotes').value.trim()};
+  save();closeModal('finishModal');toast('Job marked as finished');
+});
+document.addEventListener('click',e=>{
+  const action=e.target.closest('[data-action]');
+  if(action){
+    const j=db.jobs.find(x=>x.id===action.dataset.id);if(!j)return;
+    switch(action.dataset.action){
+      case 'start':j.status='in_progress';save();toast('Job moved to In progress');break;
+      case 'wait':j.status='not_started';save();toast('Job moved to Not started');break;
+      case 'finish':openFinishModal(j.id);break;
+      case 'delete':if(confirm('Delete this job permanently?')){db.jobs=db.jobs.filter(x=>x.id!==j.id);save();toast('Job deleted')}break;
+      case 'details':showJobDetails(j.id);break;
+    }
+  }
+  const remove=e.target.closest('[data-remove-catalog]');
+  if(remove){
+    const key=remove.dataset.removeCatalog,index=Number(remove.dataset.index);
+    const item=db.catalogs[key]?.[index];if(!item)return;
+    if(confirm('Remove "'+item+'" from your options? Existing finished job records will stay unchanged.')){db.catalogs[key].splice(index,1);save();toast('Option removed')}
+  }
+});
+document.querySelectorAll('.catalog-form').forEach(form=>form.addEventListener('submit',e=>{
+  e.preventDefault();const key=form.dataset.catalog,input=form.elements.item,value=input.value.trim();
+  if(!value)return;
+  if(db.catalogs[key].some(x=>x.toLowerCase()===value.toLowerCase())){toast('That option already exists');return}
+  db.catalogs[key].push(value);save();input.value='';toast('New option added');
+}));
+document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{
+  jobFilter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));renderJobs();
+}));
+$('jobSearch').addEventListener('input',renderJobs);$('completedSearch').addEventListener('input',renderCompleted);$('historySearch').addEventListener('input',renderHistory);
+$('exportBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify({app:'Printlog',version:2,exportedAt:new Date().toISOString(),...db},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='printlog-backup-'+today()+'.json';a.click();URL.revokeObjectURL(url);toast('Backup downloaded');
+});
+carryForward();render();
 })();
