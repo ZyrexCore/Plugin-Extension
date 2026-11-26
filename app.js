@@ -77,7 +77,7 @@ function renderJobs(){
 }
 function productionText(j){
   const p=j.production||{};
-  return [p.machine,p.workType,...(p.materials||[]),p.notes].filter(Boolean).join(' ').toLowerCase();
+  return [p.machine,p.workType,...(p.materials||[]),p.notes,p.cost].filter(Boolean).join(' ').toLowerCase();
 }
 function renderCompleted(){
   const q=($('completedSearch').value||'').toLowerCase();
@@ -158,7 +158,7 @@ $('jobForm').addEventListener('submit',e=>{
   const date=$('jobDate').value||today();
   if(editingJobId){
     const job=db.jobs.find(j=>j.id===editingJobId);if(!job)return;
-    job.title=title;job.customer=$('jobCustomer').value.trim();job.dueDate=$('jobDueDate').value||null;job.notes=$('jobNotes').value.trim();
+    job.title=title;job.customer=$('jobCustomer').value.trim();job.dueDate=$('jobDueDate').value||null;job.takenDate=date;job.notes=$('jobNotes').value.trim();
     if(job.status!=='finished')job.status=$('jobStatus').value;
     save();closeModal('jobModal');toast('Job details updated');
   }else{
